@@ -1,0 +1,28 @@
+# Qwen3-4B upgrade path (PHASE1_PLAN §2): a CONFIG change, never a code change.
+# Not used until the M5 decision point. load_in_4bit is wired in M2; until then
+# the loader raises NotImplementedError on this file by design.
+#
+# Only overrides vs base.yaml are listed; merge semantics land with the M2
+# config loader if we adopt overlays — until then this is a full standalone file.
+
+model:
+  name_or_path: Qwen/Qwen3-4B-Base
+  attn_implementation: sdpa
+  dtype: float16
+  load_in_4bit: true             # 16 GB card: 4B base weights must be quantised
+  split_layer: 18                # middle of 36 layers — verify from config.json on first pull
+  d_z: 1024
+
+data:
+  max_source_tokens: 512
+  max_target_tokens: 512
+  max_chunks: 8
+  max_chunk_tokens: 64
+
+train:
+  micro_batch_size: 8            # expect to lower after the 4B memory profile
+
+profile:
+  batch_size: 8
+  seq_len: 512
+  vram_budget_gib: 14.0

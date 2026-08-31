@@ -53,7 +53,11 @@ def main() -> None:
     verify("tie_word_embeddings", mc.tie_word_embeddings, True)
     print(f"[rec] vocab_size={mc.vocab_size}  head_dim={getattr(mc, 'head_dim', None)}  "
           f"intermediate_size={mc.intermediate_size}")
-    print(f"[rec] max_position_embeddings={mc.max_position_embeddings}  rope_theta={mc.rope_theta}")
+    rope = next(
+        (getattr(mc, a) for a in ("rope_parameters", "rope_scaling", "rope_theta") if hasattr(mc, a)),
+        "n/a",
+    )  # transformers v5 moved rope_theta into rope_parameters
+    print(f"[rec] max_position_embeddings={mc.max_position_embeddings}  rope={rope}")
     if cfg.model.split_layer * 2 != mc.num_hidden_layers:
         print(f"[note] split_layer={cfg.model.split_layer} is not the exact middle of "
               f"{mc.num_hidden_layers} layers (fine for ablations)")
@@ -82,10 +86,11 @@ def main() -> None:
     with torch.no_grad():
         out = model(ids, use_cache=False)
     torch.cuda.synchronize()
+    alloc, reserved = mem.peak_gib()  # read BEFORE the checks below touch full logits
     verify("forward logits finite", bool(out.logits.isfinite().all()), True)
-    print(f"[rec] logits shape {tuple(out.logits.shape)}  max |logit| = {out.logits.abs().max().item():.1f}")
-    alloc, reserved = mem.peak_gib()
-    print(f"[rec] forward B={B} S={S}: peak alloc {alloc:.2f} GiB, reserved {reserved:.2f} GiB")
+    print(f"[rec] logits shape {tuple(out.logits.shape)}  dtype {out.logits.dtype}  "
+          f"max |logit| = {out.logits.abs().max().item():.1f}")
+    print(f"[rec] forward B={B} S={S}: peak alloc {alloc:.2f} GiB, reserved {reserved:.2f} GiB (pure forward)")
 
     with torch.no_grad():
         for _ in range(3):  # warmup

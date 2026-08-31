@@ -19,10 +19,12 @@ Usage:
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
 import torch
 import torch.nn.functional as F
+import torch.utils.checkpoint
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -49,15 +51,28 @@ def embed_and_layers(model, input_ids: torch.Tensor, n_layers: int) -> torch.Ten
     return h
 
 
-def chunked_ce(model, hidden: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-    """Cross-entropy over the full vocab without materialising full-seq logits."""
-    total, n = hidden.new_zeros((), dtype=torch.float32), 0
-    for i in range(0, hidden.shape[1], CHUNK_TOKENS):
-        logits = model.lm_head(hidden[:, i : i + CHUNK_TOKENS])
-        t = targets[:, i : i + CHUNK_TOKENS]
-        total = total + F.cross_entropy(logits.float().flatten(0, 1), t.flatten(), reduction="sum")
-        n += t.numel()
-    return total / n
+def chunked_ce(model, hidden: torch.Tensor, targets: torch.Tensor, use_checkpoint: bool = False) -> torch.Tensor:
+    """Cross-entropy over the full vocab, CHUNK_TOKENS *flattened* positions at a
+    time (chunking the sequence axis alone is no chunking at all when B×S fits
+    one slice). With use_checkpoint=True each chunk's logits are recomputed
+    during backward, so only one chunk is ever alive — the configuration M2's
+    training loss will use.
+    """
+    h = hidden.flatten(0, 1)
+    t = targets.flatten()
+
+    def chunk_loss(h_chunk: torch.Tensor, t_chunk: torch.Tensor) -> torch.Tensor:
+        logits = model.lm_head(h_chunk)
+        return F.cross_entropy(logits.float(), t_chunk, reduction="sum")
+
+    total = hidden.new_zeros((), dtype=torch.float32)
+    for i in range(0, h.shape[0], CHUNK_TOKENS):
+        hc, tc = h[i : i + CHUNK_TOKENS], t[i : i + CHUNK_TOKENS]
+        if use_checkpoint:
+            total = total + torch.utils.checkpoint.checkpoint(chunk_loss, hc, tc, use_reentrant=False)
+        else:
+            total = total + chunk_loss(hc, tc)
+    return total / t.numel()
 
 
 def report(tag: str, note: str = "") -> tuple[float, float]:
@@ -121,18 +136,25 @@ def main() -> None:
     scaler = torch.amp.GradScaler("cuda")
 
     def train_shaped(checkpointing: bool, note: str) -> None:
+        # NB: on WSL2 the driver oversubscribes into host RAM instead of raising
+        # OOM — an over-budget run completes, silently and slowly. Wall time is
+        # printed so the spill shows up even when no error does.
         if checkpointing:
             model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
         else:
             model.gradient_checkpointing_disable()
         mem.reset_peak()
+        t0 = time.monotonic()
         try:
             with torch.autocast("cuda", dtype=torch.float16):
                 hidden = model.model(ids, use_cache=False).last_hidden_state
-                loss = chunked_ce(model, hidden, targets)
+                loss = chunked_ce(model, hidden, targets, use_checkpoint=True)
             scaler.scale(loss).backward()
             torch.cuda.synchronize()
-            report(f"f. train-shaped fwd+bwd, checkpointing={'on' if checkpointing else 'off'}", note)
+            report(
+                f"f. train-shaped fwd+bwd, checkpointing={'on' if checkpointing else 'off'}",
+                f"{note} {time.monotonic() - t0:.1f}s",
+            )
         except torch.cuda.OutOfMemoryError:
             print(f"{'f. train-shaped fwd+bwd, checkpointing=' + ('on' if checkpointing else 'off'):<58} "
                   f"OOM at B={B} — finding, not failure; M2 profile is binding")
