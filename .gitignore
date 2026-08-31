@@ -1,0 +1,19 @@
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# artifacts: checkpoints, tensorboard, telemetry
+runs/
+
+# generated datasets; small committed fixtures are the exception
+data/*
+!data/fixtures/
+
+# editor / OS junk
+*Zone.Identifier
+.DS_Store
+.vscode/
+.idea/

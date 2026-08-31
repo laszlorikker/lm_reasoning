@@ -1,0 +1,28 @@
+# Phase 1 base config — every experimental knob lives here (kickoff rule 6).
+# M0 subset; sections grow per milestone. The Qwen3-4B upgrade must be a config
+# change only (see configs/qwen3_4b.yaml when it lands).
+
+model:
+  name_or_path: Qwen/Qwen3-1.7B-Base
+  attn_implementation: sdpa      # sm_75: no flash-attn (PHASE1_PLAN §1)
+  dtype: float16                 # sm_75: no bf16 (PHASE1_PLAN §1)
+  load_in_4bit: false            # true for the 4B upgrade path
+  split_layer: 14                # encoder = layers [0, split); ablate 12/14/16
+  d_z: 1024
+
+data:
+  max_source_tokens: 512
+  max_target_tokens: 512
+  max_chunks: 8
+  max_chunk_tokens: 64
+
+train:
+  micro_batch_size: 8
+  # optimiser / schedule / loss weights land in M2/M3
+
+profile:
+  batch_size: 8
+  seq_len: 512
+  # Measured Windows-side baseline on this card: 23 MiB (2026-08-31, WSL2,
+  # display on the iGPU) -> the plan's 14 GB budget stands. See CLAUDE.md.
+  vram_budget_gib: 14.0
