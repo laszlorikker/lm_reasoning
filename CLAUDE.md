@@ -96,6 +96,10 @@ box, the working conventions, and how to run things.
   (PHASE1_PLAN §8). Nothing in Phase 1 may assume a particular reasoner.
 - Tests live in `tests/` (pytest). Mandatory before any training: with
   cross-attention gates at zero, decoder logits must equal the base LM's.
+- DataLoader runs with **num_workers=0**: tokenization/chunking is precomputed
+  in the dataset, collation is cheap tensor stuffing, and the train loop
+  schedules p_id by mutating `collator.p_id` (live only without workers).
+  Word dropout is model-side (train-only), never in the collator.
 - Docs update as work happens, not at milestone end: `DATA.md` (datasets
   actually used, counts, language mix, examples), `RESULTS.md` (one table per
   evaluation, with baselines).

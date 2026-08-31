@@ -28,7 +28,10 @@ TensorBoard.
 ## Examples panel
 
 A fixed panel of **32 validation documents** — seeded, spanning all languages in
-the mix, the *same* panel every eval so steps can be diffed. Per document:
+the mix, the *same* panel (same seed, same IDs) forever, so steps can be diffed.
+Composition (confirmed 2026-08-31): at least a third are **multi-chunk documents
+(3–8 sentences)**; the singles are deliberately hard — negation-heavy, numbers
+and named entities, long multi-clause sentences. Per document:
 
 - source with chunk boundaries marked;
 - target paraphrase;
@@ -44,11 +47,16 @@ Two failure tables:
 - the 10 hard negatives with the highest cosine to their source (where
   minimality is being missed).
 
-## Cost budget
+## Cost budget (revised 2026-08-31: ratio rule replaces the 2-minute rule)
 
+- The per-interval report must cost **< 10% of the training time between
+  evals**; the eval interval is set from the M3 measurement rather than
+  squeezing the report.
 - Panel and histograms come from a **fixed 2k-document val subset**; full
-  metrics only at milestone evals. Target: **report renders in under two
-  minutes**.
+  metrics only at milestone evals.
+- Fixed decisions: encoder-half-only passes for the 2k pool; panel decoding is
+  **greedy with max_new_tokens=128**; NLI residency decided from the M3 memory
+  profile.
 
 ## Implementation notes (mine — review at M3)
 

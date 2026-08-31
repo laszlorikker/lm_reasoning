@@ -15,6 +15,27 @@ data:
   max_target_tokens: 512
   max_chunks: 8
   max_chunk_tokens: 64
+  # ~50M source+target tokens, >=30% of pairs with K>=3 chunks (M1 addition 2).
+  # Achieved counts/K-distribution land in DATA.md from runs/m1/pilot_stats.json.
+  pilot:
+    seed: 17
+    target_multichunk_share: 0.30
+    negatives:
+      minimal_pair_share_en: 0.25   # share of en-source pairs that get a generated negative
+      per_example: 1
+    sources:
+      opus100_singles: {n: 150000}
+      paws_x_singles: {per_lang: 12000, langs: [en, fr, de, es]}
+      qqp_singles: {n: 40000}
+      mrpc_singles: {n: 3000}
+      nli_entailment: {n: 30000}
+      concat_translation: {n: 75000, k_min: 3, k_max: 6}
+      concat_paraphrase:
+        n: 25000
+        k_min: 3
+        k_max: 6
+        lang_shares: {en: 0.7, fr: 0.1, de: 0.1, es: 0.1}
+      math_derivation: {n: 25000}
 
 train:
   micro_batch_size: 8

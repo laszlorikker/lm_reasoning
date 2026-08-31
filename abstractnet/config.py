@@ -26,6 +26,9 @@ class DataCfg:
     max_target_tokens: int = 512
     max_chunks: int = 8
     max_chunk_tokens: int = 64
+    # pilot-corpus recipe (source budgets, negative shares, K targets);
+    # validated by scripts/build_pilot.py, which owns its schema
+    pilot: dict | None = None
 
 
 @dataclass
