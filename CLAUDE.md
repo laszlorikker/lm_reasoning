@@ -71,6 +71,10 @@ box, the working conventions, and how to run things.
 - **≤ 30 minutes per run through M4.** Ask before anything longer.
 - M3 must ship checkpointing every ≤ 15 minutes plus a *tested*
   resume-from-checkpoint, so M5 can run unattended in 30-minute windows.
+- M3/M4 must ship the validation report (`eval/val_report.py`) per
+  `eval/VAL_REPORT_SPEC.md`: self-contained HTML + TensorBoard at every eval
+  interval, standalone-runnable on any checkpoint, < 2 min per report. M1 must
+  reserve its fixed 2k-doc val subset and seeded 32-doc panel (see spec).
 - Every milestone that touches the model ends with
   `python scripts/profile_memory.py` at the configured batch/seq — it
   hard-fails when peak reserved exceeds the budget (kickoff rule 4).
