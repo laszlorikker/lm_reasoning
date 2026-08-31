@@ -48,15 +48,58 @@ Construction rules:
 - Identity targets are NOT in the data: `p_id` is applied at train time
   (collator, scheduled by the train loop).
 
-### Measured (runs/m1/pilot_stats.json)
+### Measured (runs/m1/pilot_stats.json, build of 2026-08-31)
 
-TBD_PILOT_TABLE
+| source | pairs | tokens (src+tgt) | K≥3 | negatives attached |
+|---|---:|---:|---:|---:|
+| opus100_singles | 149,969 | 6,022,241 | 1.6% | 16,736 |
+| concat_translation | 91,083 | 27,878,711 | 99.9% | 11,304 |
+| paws_x_singles (en/fr/de/es) | 48,000 | 3,180,109 | 0.4% | 27,817 |
+| qqp_singles | 40,000 | 968,483 | 0.5% | 9,881 |
+| nli_entailment | 30,000 | 1,119,552 | 0.4% | 37,172 |
+| concat_paraphrase | 21,642 | 3,220,036 | 99.8% | 8,394 |
+| math_derivation | 5,105 | 1,414,037 | 99.5% | 1,249 |
+| mrpc_singles | 2,474 | 131,167 | 0.3% | 579 |
+| **total** | **388,273** | **43,934,336** | **31.1%** | **113,132** |
 
-TBD_PILOT_AGGREGATE
+- **K≥3 share 31.1% of pairs — target ≥30% met** (M1 addition 2).
+  K histogram: 1→245,962 · 2→21,673 · 3→24,224 · 4→27,011 · 5→27,380 ·
+  6→26,016 · 7→11,307 · 8→4,700.
+- Language-pair mix (top): en↔en 106,948; en↔{fr,es,de} ≈ 26.1–26.8k per
+  direction; en↔{it,pt} ≈ 20.4–20.9k per direction; fr/de/es same-language
+  ≈ 13.4k each (paws-x + concat_paraphrase).
+- Negatives: 58,339 generated minimal pairs (spaCy rules, en), the rest
+  natural (paws-x label-0 adversarials, MNLI contradictions, one-constituent
+  substitutions in concat_paraphrase). 4 generated negatives dropped at caps.
+- Drops (counted, not truncated): 14,590 source-over-cap, 4,400
+  target-over-cap; 26,621 terminal periods appended in concat rows; 9,796
+  concat groups skipped by guards.
+- math_derivation undershot its 20k budget at **5,105 pairs**: in the wider
+  train_5M stream, same-problem solutions sit farther apart, so the bounded
+  100k-problem discovery buffer evicts entries before a partner arrives
+  (train_1M had yielded 6,818 under the same buffer). Likely fix if more math
+  mass is wanted later: larger buffer (RAM is plentiful) — deferred, no stated
+  target depends on it.
 
-### Example pairs
+### Example pairs (verbatim from data/processed/pilot_v1/full)
 
-TBD_EXAMPLES
+**nli_entailment** (multi_nli, en→en, K=1)
+- SRC: "Dannie Abse told the London Observer , [Dylan's] writing is inferior poetry, and inferior poetry is not really poetry at all."
+- TGT: "Dannie Abse talked to the London Observer."
+- NEG (contradiction): "Dannie Abse did not spend any time talking to London Observer."
+
+**concat_translation** (europarl-en-pt, en→pt, K=5)
+- SRC: "In many cases they do not have the civic structures and other organisations in place to properly enforce some of the regulations we would like and some of the monitoring that would take place. So we cannot exclude one co…"
+- TGT: "Em muitos casos não possuem estruturas civis e outras organizações aptas para impor o cumprimento de alguma da regulamentação…"
+
+**paraphrase** (glue-qqp, en→en, K=1) — note the negative's grammar, see §4
+- SRC: "What do you think about the ban on 500 and 1000 denomination notes in India?"
+- TGT: "What are your views on demonetization of 500 and 1000 rupee notes by the Modi Government?"
+- NEG (generated, negation): "What do not you think about the ban on 500 and 1000 denomination notes in India?"
+
+**math_derivation** (openmath2-augmented_math, en→en, K=5)
+- SRC: "To find the maximum number of boxes that can be stored in the container, we need to divide the volume of the container by the volume of a single box. First, calculate the volume of a single box: …"
+- TGT: "To find the maximum number of boxes that can fit in the container, we need to calculate the volume of a single box and then divide the total volume of the container by the volume of a single box. …"
 
 ## 3. Frozen validation artifacts (committed under `data/fixtures/`)
 
@@ -75,7 +118,20 @@ math problems in the `is_val_problem` hash class (hash%97==0).
   numbers, entities, long multi-clause; each with a controlled paraphrase, a
   hand-written minimal negative, and reference translations on several).
 
-TBD_VAL_PANEL_STATS
+Measured (runs/m1/val_panel_stats.json, frozen 2026-08-31):
+
+- **val_pool_v1: 2,000 docs.** Languages: en 923, fr 497, de 240, es 240,
+  it 50, pt 50. Origins: paws-x test 560, opus-100 held-out 500,
+  concat-translation val-reserved 500, xnli validation 200, multi_nli
+  validation 180, openmath2 val-hash 60. K≥3: 574 (28.7%). Coverage: 1,000
+  with a paraphrase partner, 1,000 with a translation partner, 1,060 with at
+  least one hard negative (adversarial / contradiction / generated).
+- **panel_v1: 32 docs** (`panel-00..panel-31`): 12 multi-chunk (9 concat
+  translation + 3 math derivations) + 20 hand-written hard singles. Languages:
+  en 15, de 5, fr 4, it 3, pt 3, es 2 — all six covered. 23 with paraphrase,
+  14 with reference translations, 30 with hard negatives (2 drawn docs had no
+  applicable language-agnostic rule; the failure tables draw from the pool, so
+  coverage is unaffected).
 
 ## 4. Known v1 limitations
 
@@ -83,6 +139,14 @@ TBD_VAL_PANEL_STATS
   natural (paws-x label-0, xnli contradictions) plus the language-agnostic
   digit-bump used in the panel. LLM-generated rewrites: hook in
   `minimal_pairs.GENERATORS`, unimplemented by design.
+- **Negation insertion on interrogatives is ungrammatical** ("What do not you
+  think…"): meaning still flips, and the contrastive term does not score
+  fluency, but a fluency-sensitive consumer should filter by rule. Affects the
+  `negation` rule on question-shaped sources (qqp) only.
+- **paws-x TRAIN sides are machine-translated** for fr/de/es (test is human
+  translated) — visible as noisy phrasing in some paraphrase/concat_paraphrase
+  rows. Kept: the equivalence classes and adversarial negatives remain valid;
+  the val pool draws from the human-translated test split.
 - `concat_paraphrase` documents are synthetic discourse (independent sentences).
 - Portuguese sentence segmentation uses the punctuation fallback.
 - xnli train and anli are available but unused for training in the pilot.

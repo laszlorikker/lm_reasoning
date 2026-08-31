@@ -161,7 +161,7 @@ def k_of(text: str, lang: str, tok) -> int:
 # ----------------------------------------------------------------- val pool
 
 
-def pool_paws(tok, per_lang=125):
+def pool_paws(tok, per_lang=140):
     pools = P.load_paws_pools(["en", "fr", "de", "es"], split="test")
     for lang, pool in pools.items():
         for s1, s2, adv in pool[:per_lang]:
@@ -170,7 +170,7 @@ def pool_paws(tok, per_lang=125):
                        paraphrase=s2, translations={}, hard_negatives=negs)
 
 
-def pool_opus(tok, per_cfg=80):
+def pool_opus(tok, per_cfg=100):
     import datasets
 
     for cfg in P.OPUS_CFGS:
@@ -205,7 +205,7 @@ def pool_concat(cfg, tok, n=500):
                    paraphrase=None, translations={ex.lang_tgt: ex.target}, hard_negatives=[])
 
 
-def pool_nli(tok, n=150):
+def pool_nli(tok, n=180):
     for ex in P.iter_nli_entailment(n, seed=23, split="validation_matched"):
         yield dict(text=ex.source, lang="en", origin="multi_nli-val",
                    paraphrase=ex.target, translations={},
@@ -348,6 +348,10 @@ def main() -> None:
     Path("runs/m1/val_panel_stats.json").write_text(json.dumps(stats, indent=2))
     print(json.dumps(stats, indent=2))
     assert stats["panel"]["k_ge3"] >= 11, "panel must be >=1/3 multi-chunk"
+    # sentinel: streaming daemon threads can crash interpreter teardown AFTER
+    # all outputs are written — judge success by this line + the files, not
+    # only the exit code
+    print("VAL/PANEL BUILD COMPLETE")
 
 
 if __name__ == "__main__":
