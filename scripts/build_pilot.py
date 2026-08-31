@@ -77,7 +77,7 @@ def extract(source: str, pcfg: dict, stats: Counter):
     elif source == "nli_entailment":
         yield from P.iter_nli_entailment(s["n"], seed)
     elif source == "math_derivation":
-        yield from P.iter_math_derivations(s["n"], seed)
+        yield from P.iter_math_derivations(s["n"], seed, split=s.get("split", "train_1M"))
     else:
         raise KeyError(f"unknown source {source!r}")
 

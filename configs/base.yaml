@@ -29,13 +29,15 @@ data:
       qqp_singles: {n: 40000}
       mrpc_singles: {n: 3000}
       nli_entailment: {n: 30000}
-      concat_translation: {n: 75000, k_min: 3, k_max: 6}
+      concat_translation: {n: 95000, k_min: 3, k_max: 6}
       concat_paraphrase:
         n: 25000
         k_min: 3
         k_max: 6
         lang_shares: {en: 0.7, fr: 0.1, de: 0.1, es: 0.1}
-      math_derivation: {n: 25000}
+      # train_1M exhausted at ~6.8k pairs (pair discovery ~1 per 147 rows);
+      # train_5M streams until the budget is met. Val separation is hash-based.
+      math_derivation: {n: 20000, split: train_5M}
 
 train:
   micro_batch_size: 8

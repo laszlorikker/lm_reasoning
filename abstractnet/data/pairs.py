@@ -250,12 +250,14 @@ def iter_nli_entailment(n: int, seed: int, split: str = "train"):
 
 
 def iter_math_derivations(n: int, seed: int, val: bool = False,
-                          min_words: int = 15, max_words: int = 260):
+                          min_words: int = 15, max_words: int = 260,
+                          split: str = "train_1M"):
     """Two solutions to the same OpenMathInstruct-2 problem = two derivations of
-    one conclusion. Streaming with a bounded buffer; no full download."""
+    one conclusion. Streaming with a bounded buffer; no full download. Val
+    separation is by problem hash (is_val_problem), so it holds across splits."""
     import datasets
 
-    ds = datasets.load_dataset("nvidia/OpenMathInstruct-2", split="train_1M", streaming=True)
+    ds = datasets.load_dataset("nvidia/OpenMathInstruct-2", split=split, streaming=True)
     rng = random.Random(seed)
     buffer: OrderedDict[str, str] = OrderedDict()
     got = 0
