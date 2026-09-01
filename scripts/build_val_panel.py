@@ -170,7 +170,7 @@ def pool_paws(tok, per_lang=120):
                        paraphrase=s2, translations={}, hard_negatives=negs)
 
 
-def pool_opus(tok, per_cfg=120):
+def pool_opus(tok, per_cfg=125):  # over-provisioned; trimmed back to exactly 2000
     # v2 rebalance: it/pt configs contribute their scarce language on the text
     # side every time; other configs alternate directions.
     import datasets
@@ -306,7 +306,14 @@ def main() -> None:
                 pool_nli(tok), pool_xnli(tok), pool_math(tok)):
         pool.extend(gen)
     seen = set()
-    pool = [d for d in pool if not (d["text"] in seen or seen.add(d["text"]))][:2000]
+    pool = [d for d in pool if not (d["text"] in seen or seen.add(d["text"]))]
+    # trim to EXACTLY 2000 by dropping surplus en-side opus docs (the abundant
+    # class) — never scarce languages, never math/xnli/nli
+    surplus = [i for i, d in enumerate(pool)
+               if d["origin"].startswith("opus100") and d["lang"] == "en"]
+    while len(pool) > 2000 and surplus:
+        pool.pop(surplus.pop())
+    assert len(pool) == 2000, f"pool must be exactly 2000 docs, got {len(pool)}"
 
     # generated minimal-pair negatives for en docs that lack any hard negative
     idx = [i for i, d in enumerate(pool) if d["lang"] == "en" and not d["hard_negatives"]]

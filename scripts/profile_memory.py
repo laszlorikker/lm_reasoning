@@ -83,7 +83,7 @@ def report(tag: str, note: str = "") -> tuple[float, float]:
     return alloc, reserved
 
 
-def profile_train_step(cfg) -> None:
+def profile_train_step(cfg, micro: int | None = None, gate: bool = True) -> dict | None:
     """M2: full train-step memory profile — AbstractLM, encoder on (x, x', x⁻),
     decoder with gradient checkpointing, chunked CE, AdamW8bit states, at the
     configured batch/seq with the measured M1 K distribution. HARD budget gate
@@ -95,19 +95,20 @@ def profile_train_step(cfg) -> None:
     from abstractnet.modeling.abstract_lm import AbstractLM
 
     budget = cfg.profile.vram_budget_gib
+    B = micro or cfg.profile.batch_size
     mem.apply_budget_guard(budget)
     corpus = next(p for p in ("data/processed/pilot_v1.1/full", "data/processed/pilot_v1/full")
                   if Path(p).exists())
     model = AbstractLM(cfg)
     model.lm.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.train()
-    # near-cap documents: the binding 8x512-shaped envelope, not the corpus mean
-    batch = real_batch(corpus, cfg.profile.batch_size, model.tokenizer, seed=5,
+    # near-cap documents: the binding worst-case envelope, not the corpus mean
+    batch = real_batch(corpus, B, model.tokenizer, seed=5,
                        mixed_k=True, min_src_tokens=int(cfg.profile.seq_len * 0.75))
     ks = batch["src_z_mask"].sum(1).tolist()
     pair_tokens = int(batch["src_mask"].sum() + batch["tgt_mask"].sum())
     neg_tokens = int(batch["neg_mask"].sum())
-    print(f"=== train-step profile: B={cfg.profile.batch_size}, corpus={corpus}, "
+    print(f"=== train-step profile: B={B}, corpus={corpus}, "
           f"K={ks}, pair_tokens={pair_tokens}, neg_tokens={neg_tokens}, budget={budget:.1f} GiB ===")
 
     new_p = [p for n, p in model.named_parameters() if p.requires_grad and "lora_" not in n]
@@ -137,16 +138,22 @@ def profile_train_step(cfg) -> None:
         dt = (time.monotonic() - t0) / 2
     except torch.cuda.OutOfMemoryError as e:
         print(f"BUDGET EXCEEDED: OOM under the {budget:.1f} GiB guard — {str(e).splitlines()[0]}")
-        sys.exit(1)
+        if gate:
+            sys.exit(1)
+        return {"micro": B, "oom": True}
 
     alloc, reserved = report("train step (fwd+bwd+AdamW8bit)", f"{dt:.2f} s/step")
     print(f"throughput: {pair_tokens / dt:,.0f} pair-tokens/s "
           f"({(pair_tokens + neg_tokens) / dt:,.0f} incl. negatives)")
-    print(f"\nbudget gate: peak reserved {reserved:.2f} GiB vs {budget:.1f} GiB")
-    if reserved > budget:
-        print("BUDGET EXCEEDED — failing loudly (kickoff rule 4)")
-        sys.exit(1)
-    print("WITHIN BUDGET")
+    if gate:
+        print(f"\nbudget gate: peak reserved {reserved:.2f} GiB vs {budget:.1f} GiB")
+        if reserved > budget:
+            print("BUDGET EXCEEDED — failing loudly (kickoff rule 4)")
+            sys.exit(1)
+        print("WITHIN BUDGET")
+    return {"micro": B, "oom": False, "alloc_gib": round(alloc, 2),
+            "reserved_gib": round(reserved, 2), "s_per_step": round(dt, 2),
+            "pair_tok_s": round(pair_tokens / dt), "pair_tokens": pair_tokens}
 
 
 def main() -> None:

@@ -59,6 +59,12 @@ class PairCollator:
         self.p_id = p_id  # scheduled from the train loop
         self._rng = random.Random(seed)
 
+    def reseed(self, seed: int) -> None:
+        """Make the identity draws a pure function of the caller's seed — the
+        train loop reseeds per (run_seed, step, micro) so a resumed run makes
+        bit-identical identity decisions (M3 resume proof)."""
+        self._rng = random.Random(seed)
+
     def __call__(self, rows: list[dict]) -> dict:
         srcs = [(r["src_ids"], r["src_spans"]) for r in rows]
         tgts, langs, is_identity = [], [], []

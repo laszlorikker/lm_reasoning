@@ -202,9 +202,17 @@ class AbstractLM(nn.Module):
             l_con = symmetric_info_nce(va, vb, vn, tc.tau)
 
             loss = l_recon + tc.lambda_c * l_con + tc.lambda_r * kl
+        with torch.no_grad():  # light z health stats for TB (full spectrum = val report)
+            zc = z_clean.float()
+            zm_f = src_zm.unsqueeze(-1).float()
+            n_chunks = src_zm.sum().clamp(min=1)
+            z_norm = (zc.norm(dim=-1) * src_zm).sum() / n_chunks
+            mean = (zc * zm_f).sum((0, 1)) / n_chunks
+            z_dim_var = (((zc - mean) ** 2) * zm_f).sum((0, 1)) / n_chunks
         return {"loss": loss, "recon": l_recon.detach(), "contrastive": l_con.detach(),
                 "rate_kl": kl.detach(),
-                "gates": torch.stack([w.gate.detach() for w in self._wrappers()])}
+                "gates": torch.stack([w.gate.detach() for w in self._wrappers()]),
+                "z_norm": z_norm, "z_dim_var_mean": z_dim_var.mean()}
 
     # ------------------------------------------------------------ §8 interface
 

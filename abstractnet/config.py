@@ -43,6 +43,9 @@ class DataCfg:
     max_target_tokens: int = 512
     max_chunks: int = 8
     max_chunk_tokens: int = 64
+    corpus_path: str = "data/processed/pilot_v1.1/full"
+    val_pool_path: str = "data/fixtures/val_pool_v2.jsonl"
+    panel_path: str = "data/fixtures/panel_v1.jsonl"
     # pilot-corpus recipe (source budgets, negative shares, K targets);
     # validated by scripts/build_pilot.py, which owns its schema
     pilot: dict | None = None
@@ -59,6 +62,22 @@ class TrainCfg:
     p_id_start: float = 0.2
     p_id_end: float = 0.05
     p_id_decay_frac: float = 0.2   # p_id decays over the first fraction of steps
+    # M3: optimiser / schedule / run mechanics (PHASE1_PLAN §5, M3 spec)
+    effective_batch: int = 64      # via gradient accumulation
+    lr_new: float = 2.0e-4
+    lr_lora: float = 1.0e-4
+    warmup_steps: int = 500
+    weight_decay: float = 0.01
+    grad_clip: float = 1.0
+    epochs: int = 1
+    max_steps: int = 0             # 0 = derive from epochs x corpus size
+    seed: int = 1234
+    log_interval: int = 10
+    eval_interval_steps: int = 0   # 0 = auto from measured step + report time (<10% rule)
+    checkpoint_interval_steps: int = 500
+    checkpoint_interval_minutes: float = 15.0
+    keep_checkpoints: int = 3
+    telemetry_interval_s: float = 30.0
 
 
 @dataclass
