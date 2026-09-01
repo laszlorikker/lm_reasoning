@@ -101,7 +101,9 @@ def profile_train_step(cfg) -> None:
     model = AbstractLM(cfg)
     model.lm.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.train()
-    batch = real_batch(corpus, cfg.profile.batch_size, model.tokenizer, seed=5, mixed_k=True)
+    # near-cap documents: the binding 8x512-shaped envelope, not the corpus mean
+    batch = real_batch(corpus, cfg.profile.batch_size, model.tokenizer, seed=5,
+                       mixed_k=True, min_src_tokens=int(cfg.profile.seq_len * 0.75))
     ks = batch["src_z_mask"].sum(1).tolist()
     pair_tokens = int(batch["src_mask"].sum() + batch["tgt_mask"].sum())
     neg_tokens = int(batch["neg_mask"].sum())

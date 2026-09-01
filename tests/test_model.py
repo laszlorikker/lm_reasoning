@@ -184,6 +184,30 @@ def test_trainable_set_and_frozen_lower_half(model):
         assert report.get(group, 0) > 0, f"group {group} has no trainables"
 
 
+# --------------------------------------------------------- checkpoint round-trip
+
+
+@needs_gpu
+def test_trainable_checkpoint_round_trip(model, tmp_path):
+    from abstractnet.modeling.abstract_lm import AbstractLM
+
+    with torch.no_grad():
+        model.z_proj.weight += 0.123  # make state distinguishable from init
+        model._wrappers()[0].gate.fill_(0.25)
+    path = str(tmp_path / "trainable.pt")
+    model.save_trainable(path)
+    fresh = AbstractLM(model.cfg, device="cuda")
+    assert not torch.allclose(fresh.z_proj.weight, model.z_proj.weight)
+    loaded = AbstractLM.load_trainable(model.cfg, path)
+    assert torch.allclose(loaded.z_proj.weight, model.z_proj.weight)
+    assert float(loaded._wrappers()[0].gate) == 0.25
+    del fresh, loaded
+    torch.cuda.empty_cache()
+    with torch.no_grad():  # restore for other tests
+        model.z_proj.weight -= 0.123
+        model._wrappers()[0].gate.zero_()
+
+
 # ------------------------------------------------------------- forward smoke
 
 
