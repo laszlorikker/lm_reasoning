@@ -23,7 +23,19 @@ Probed via streaming (no bulk downloads); full field/sample details in
 | europarl (5 configs) | OK | **row continuity verified** (consecutive rows form a continuous speech) → document-level source for concat-k |
 | news_commentary (en-fr, de-en, en-es) | OK | document-ordered rows, same use |
 
-## 2. Pilot corpus — `data/processed/pilot_v1` (recipe: `configs/base.yaml` → `data.pilot`, seed 17)
+## 2. Pilot corpus — `data/processed/pilot_v1.1` (recipe: `configs/base.yaml` → `data.pilot`, seed 17)
+
+**v1.1 (2026-09-01, M1 review):** rebuilt `qqp_singles` and `concat_paraphrase`
+with the grammar-aware negation rule (aux inversion in questions, verb-initial
+skip); `math_derivation` rebuilt with an exact group-by-problem join on
+`train_2M` capped at 4 pairs/problem → **8,934 pairs** (the 30–50k target
+needs `train_5M` at ~6 GB, pending an explicit download approval);
+`concat_translation` kept from v1 (declarative text; a residual of ungrammatical
+question-negatives estimated well under 0.1%). **Eval-leakage dedup gate**:
+167,763 content hashes covering all fixtures and full held-out splits;
+**17,268 pairs removed** (4.4% — mostly recurring qqp questions and split
+overlaps), 16 negatives stripped. `pilot_v1` remains on disk for provenance;
+all training uses v1.1.
 
 Construction rules:
 - Each example: `(source, target, lang_src, lang_tgt, pair_type, negatives[])`,
@@ -60,7 +72,8 @@ Construction rules:
 | concat_paraphrase | 21,642 | 3,220,036 | 99.8% | 8,394 |
 | math_derivation | 5,105 | 1,414,037 | 99.5% | 1,249 |
 | mrpc_singles | 2,474 | 131,167 | 0.3% | 579 |
-| **total** | **388,273** | **43,934,336** | **31.1%** | **113,132** |
+| **total v1 (pre-dedup, superseded)** | **388,273** | **43,934,336** | **31.1%** | **113,132** |
+| **total v1.1 (math regrouped 8,934 / +1.1M tok, then dedup −17,268)** | **374,834** | **45,000,094** | **33.2%** | — |
 
 - **K≥3 share 31.1% of pairs — target ≥30% met** (M1 addition 2).
   K histogram: 1→245,962 · 2→21,673 · 3→24,224 · 4→27,011 · 5→27,380 ·
@@ -118,14 +131,27 @@ math problems in the `is_val_problem` hash class (hash%97==0).
   numbers, entities, long multi-clause; each with a controlled paraphrase, a
   hand-written minimal negative, and reference translations on several).
 
-Measured (runs/m1/val_panel_stats.json, frozen 2026-08-31):
+Measured (runs/m1/val_panel_stats.json; **v2 frozen 2026-09-01** — v1 was
+en-heavy with it/pt at 50 because a per-config budgeting bug drew all concat
+docs from europarl-en-fr; v1 deleted, no checkpoint was ever evaluated on it):
 
-- **val_pool_v1: 2,000 docs.** Languages: en 923, fr 497, de 240, es 240,
-  it 50, pt 50. Origins: paws-x test 560, opus-100 held-out 500,
-  concat-translation val-reserved 500, xnli validation 200, multi_nli
-  validation 180, openmath2 val-hash 60. K≥3: 574 (28.7%). Coverage: 1,000
-  with a paraphrase partner, 1,000 with a translation partner, 1,060 with at
-  least one hard negative (adversarial / contradiction / generated).
+- **val_pool_v2: exactly 2,000 docs.** Languages: en 744, de 295, es 295,
+  fr 292, **it 187, pt 187** (requirement: ≥150 per non-English language).
+  Origins: opus-100 held-out 608, paws-x test 480, europarl val-reserved 308,
+  xnli validation 200, news-commentary val-reserved 184, multi_nli validation
+  160, openmath2 val-hash 60. K≥3: 567 (28.4%). Coverage: 900 with a
+  paraphrase partner, 1,100 with a translation partner, 885 with at least one
+  hard negative.
+- **Minimal-pair audit (M1.1 gate b)** — chrF(x, x⁻) per rule on a 2k-source
+  seeded sample; high chrF = surface-close (the point of a minimal pair);
+  20 samples per rule in `data/fixtures/minimal_pair_samples.md`:
+
+  | rule | n | chrF mean | p10 | min |
+  |---|---:|---:|---:|---:|
+  | negation | 2,775 | 95.7 | 88.4 | 32.7 |
+  | number | 644 | 95.9 | 89.8 | 32.7 |
+  | entity_swap | 305 | 94.5 | 88.5 | 68.9 |
+  | arg_swap | 976 | 91.6 | 75.7 | 36.4 |
 - **panel_v1: 32 docs** (`panel-00..panel-31`): 12 multi-chunk (9 concat
   translation + 3 math derivations) + 20 hand-written hard singles. Languages:
   en 15, de 5, fr 4, it 3, pt 3, es 2 — all six covered. 23 with paraphrase,

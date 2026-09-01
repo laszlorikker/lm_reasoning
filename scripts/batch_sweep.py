@@ -43,7 +43,7 @@ def main() -> None:
         if r.get("oom"):
             print(f"{r['micro']:>6} {'OOM':>13}")
             continue
-        accum = "64/" + str(r["micro"]) if 64 % r["micro"] else "n/a"
+        accum = f"64/{r['micro']}" if 64 % r["micro"] == 0 else "n/a"
         print(f"{r['micro']:>6} {r['reserved_gib']:>13} {r['s_per_step']:>7} "
               f"{r['pair_tok_s']:>11,} {accum:>10}")
     Path("runs/m3").mkdir(parents=True, exist_ok=True)
