@@ -249,6 +249,44 @@ def iter_nli_entailment(n: int, seed: int, split: str = "train"):
 # ---------------------------------------------------------------- math
 
 
+def iter_math_derivations_grouped(n: int, seed: int, val: bool = False,
+                                  min_words: int = 15, max_words: int = 260,
+                                  split: str = "train_2M", max_pairs_per_problem: int = 4):
+    """M1.1 replacement for the bounded-buffer heuristic: exact group-by-problem
+    join. Loads the split once (cached parquet, RAM allows it), groups guard-
+    passing solutions per problem, emits up to max_pairs_per_problem disjoint
+    solution pairs per problem in stable-hash problem order."""
+    import datasets
+
+    ds = datasets.load_dataset("nvidia/OpenMathInstruct-2", split=split)
+    ds = ds.select_columns(["problem", "generated_solution"])
+    rng = random.Random(seed)
+    groups: dict[str, list[str]] = {}
+    cap = 2 * max_pairs_per_problem
+    for row in ds:
+        prob = row["problem"].strip()
+        if is_val_problem(prob) != val:
+            continue
+        sol = row["generated_solution"].strip()
+        if not (min_words <= _wc(sol) <= max_words):
+            continue
+        g = groups.setdefault(prob, [])
+        if len(g) < cap and sol not in g:
+            g.append(sol)
+    got = 0
+    for prob in sorted(groups, key=hash_seed):
+        sols = groups[prob]
+        if len(sols) < 2:
+            continue
+        rng.shuffle(sols)
+        for i in range(0, len(sols) - 1, 2):
+            if got >= n:
+                return
+            a, b = sols[i], sols[i + 1]
+            yield PairExample(a, b, "en", "en", "math_derivation", "openmath2-grouped")
+            got += 1
+
+
 def iter_math_derivations(n: int, seed: int, val: bool = False,
                           min_words: int = 15, max_words: int = 260,
                           split: str = "train_1M"):

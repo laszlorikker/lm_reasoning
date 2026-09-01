@@ -18,6 +18,23 @@ class ModelCfg:
     load_in_4bit: bool = False
     split_layer: int = 14
     d_z: int = 1024
+    # M2: encoder/decoder additions (spec of 2026-09-01)
+    languages: tuple = ("en", "fr", "de", "es", "it", "pt")
+    k_max: int = 8
+    pool_heads: int = 8
+    pool_head_dim: int = 128
+    xattn_every: int = 2
+    xattn_heads: int = 8
+    xattn_head_dim: int = 128
+    rate: str = "noise"          # noise | kl
+    rate_sigma: float = 0.1
+    word_dropout: float = 0.2
+    lora_r: int = 16
+    lora_alpha: int = 32
+    lora_dropout: float = 0.05
+    # named adapter on upper layers of the LOWER half, encoder pass only;
+    # empty = not created (M5 ablation hook, off through M2/M3)
+    encoder_lora_layers: tuple = ()
 
 
 @dataclass
@@ -34,6 +51,14 @@ class DataCfg:
 @dataclass
 class TrainCfg:
     micro_batch_size: int = 8
+    # M2: loss weights and schedule knobs (PHASE1_PLAN §4)
+    tau: float = 0.05
+    lambda_c: float = 0.1
+    lambda_r: float = 1.0e-3
+    chunk_ce_size: int = 1024
+    p_id_start: float = 0.2
+    p_id_end: float = 0.05
+    p_id_decay_frac: float = 0.2   # p_id decays over the first fraction of steps
 
 
 @dataclass

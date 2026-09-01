@@ -9,6 +9,21 @@ model:
   load_in_4bit: false            # true for the 4B upgrade path
   split_layer: 14                # encoder = layers [0, split); ablate 12/14/16
   d_z: 1024
+  # M2 (spec 2026-09-01; readings in M2_DESIGN.md)
+  languages: [en, fr, de, es, it, pt]
+  k_max: 8
+  pool_heads: 8
+  pool_head_dim: 128
+  xattn_every: 2                 # blocks before layers 14,16,...,26
+  xattn_heads: 8
+  xattn_head_dim: 128
+  rate: noise                    # noise | kl
+  rate_sigma: 0.1
+  word_dropout: 0.2
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  encoder_lora_layers: []        # M5 ablation hook; must stay empty through M3
 
 data:
   max_source_tokens: 512
@@ -35,13 +50,20 @@ data:
         k_min: 3
         k_max: 6
         lang_shares: {en: 0.7, fr: 0.1, de: 0.1, es: 0.1}
-      # train_1M exhausted at ~6.8k pairs (pair discovery ~1 per 147 rows);
-      # train_5M streams until the budget is met. Val separation is hash-based.
-      math_derivation: {n: 20000, split: train_5M}
+      # M1.1: exact group-by-problem join (streamed buffers evicted partners);
+      # train_2M stays under the 5 GB ask-first download threshold.
+      math_derivation: {n: 40000, split: train_2M, max_pairs_per_problem: 4}
 
 train:
   micro_batch_size: 8
-  # optimiser / schedule / loss weights land in M2/M3
+  # M2 loss knobs (PHASE1_PLAN §4); optimiser/schedule land in M3
+  tau: 0.05
+  lambda_c: 0.1
+  lambda_r: 1.0e-3
+  chunk_ce_size: 1024
+  p_id_start: 0.2
+  p_id_end: 0.05
+  p_id_decay_frac: 0.2
 
 profile:
   batch_size: 8

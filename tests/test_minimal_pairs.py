@@ -44,6 +44,20 @@ def test_negation_insertion_copula():
     assert "is not" in out
 
 
+def test_negation_insertion_question_inversion():
+    out = _rule_negation(sent_of("What do you think about the ban on large notes?"), rng())
+    assert out == "What do you not think about the ban on large notes?"
+
+
+def test_negation_insertion_copula_question():
+    out = _rule_negation(sent_of("Is the budget large?"), rng())
+    assert out == "Is the budget not large?"
+
+
+def test_negation_skips_verb_initial():
+    assert _rule_negation(sent_of("Submit the report."), rng()) is None
+
+
 def test_number_digit():
     src = "The company hired 25 engineers in 2020."
     out = _rule_number(sent_of(src), rng())

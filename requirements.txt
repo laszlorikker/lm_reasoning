@@ -14,3 +14,7 @@ numpy==2.5.2
 PyYAML==6.0.3
 pytest==9.1.1
 tensorboard==2.21.0
+# M1 additions
+pysbd==0.3.4
+spacy==3.8.16
+sacrebleu==2.6.0

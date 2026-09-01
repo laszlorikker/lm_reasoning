@@ -8,6 +8,14 @@ import torch
 GIB = 1024**3
 
 
+def apply_budget_guard(budget_gib: float) -> None:
+    """WSL2 spills to host RAM instead of raising OOM (M0 finding): cap the
+    process so a genuine OOM error fires at the budget instead of a silent
+    9x slowdown. Call once per training / profiling process."""
+    total = torch.cuda.get_device_properties(0).total_memory
+    torch.cuda.set_per_process_memory_fraction(min(budget_gib * GIB / total, 1.0), 0)
+
+
 def reset_peak() -> None:
     gc.collect()
     torch.cuda.empty_cache()

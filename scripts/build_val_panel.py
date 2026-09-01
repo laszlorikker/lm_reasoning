@@ -161,7 +161,7 @@ def k_of(text: str, lang: str, tok) -> int:
 # ----------------------------------------------------------------- val pool
 
 
-def pool_paws(tok, per_lang=140):
+def pool_paws(tok, per_lang=120):
     pools = P.load_paws_pools(["en", "fr", "de", "es"], split="test")
     for lang, pool in pools.items():
         for s1, s2, adv in pool[:per_lang]:
@@ -170,11 +170,14 @@ def pool_paws(tok, per_lang=140):
                        paraphrase=s2, translations={}, hard_negatives=negs)
 
 
-def pool_opus(tok, per_cfg=100):
+def pool_opus(tok, per_cfg=120):
+    # v2 rebalance: it/pt configs contribute their scarce language on the text
+    # side every time; other configs alternate directions.
     import datasets
 
     for cfg in P.OPUS_CFGS:
         a, b = cfg.split("-")
+        scarce = next((l for l in (a, b) if l in ("it", "pt")), None)
         try:
             ds = datasets.load_dataset("Helsinki-NLP/opus-100", cfg, split="test")
         except Exception:
@@ -184,7 +187,7 @@ def pool_opus(tok, per_cfg=100):
             sa, sb = r["translation"][a].strip(), r["translation"][b].strip()
             if not (P._ok_sent(sa, 4, 60) and P._ok_sent(sb, 4, 60)):
                 continue
-            src_is_a = got % 2 == 0
+            src_is_a = (a == scarce) if scarce else (got % 2 == 0)
             src, ls = (sa, a) if src_is_a else (sb, b)
             tgt, lt = (sb, b) if src_is_a else (sa, a)
             yield dict(text=src, lang=ls, origin=f"opus100-{cfg}-heldout",
@@ -195,17 +198,24 @@ def pool_opus(tok, per_cfg=100):
 
 
 def pool_concat(cfg, tok, n=500):
+    # v2: pass the real budget so iter_concat_translation spreads it across all
+    # 8 configs (v1 passed 10**9 and drew everything from the first config);
+    # force it/pt onto the text side to secure scarce-language coverage.
     stats = Counter()
     p = cfg.data.pilot
     src_cfg = p["sources"]["concat_translation"]
     for ex in itertools.islice(
-        P.iter_concat_translation(10**9, p["seed"], src_cfg["k_min"], src_cfg["k_max"], stats, val=True), n
+        P.iter_concat_translation(n, p["seed"], src_cfg["k_min"], src_cfg["k_max"], stats, val=True), n
     ):
-        yield dict(text=ex.source, lang=ex.lang_src, origin=ex.origin + "-valreserved",
-                   paraphrase=None, translations={ex.lang_tgt: ex.target}, hard_negatives=[])
+        text_lang, text = ex.lang_src, ex.source
+        tr_lang, tr = ex.lang_tgt, ex.target
+        if tr_lang in ("it", "pt"):
+            text_lang, text, tr_lang, tr = tr_lang, tr, text_lang, text
+        yield dict(text=text, lang=text_lang, origin=ex.origin + "-valreserved",
+                   paraphrase=None, translations={tr_lang: tr}, hard_negatives=[])
 
 
-def pool_nli(tok, n=180):
+def pool_nli(tok, n=160):
     for ex in P.iter_nli_entailment(n, seed=23, split="validation_matched"):
         yield dict(text=ex.source, lang="en", origin="multi_nli-val",
                    paraphrase=ex.target, translations={},
@@ -307,7 +317,11 @@ def main() -> None:
         d["id"] = f"vp-{i:04d}"
         d["k_est"] = k_of(d["text"], d["lang"], tok)
         d["is_panel"] = False
-    with open(FIXTURES / "val_pool_v1.jsonl", "w") as f:
+    # v2 rebalance gate: >=150 docs per non-English language (M1 review Q4)
+    lang_counts = Counter(d["lang"] for d in pool)
+    for lang in ("fr", "de", "es", "it", "pt"):
+        assert lang_counts[lang] >= 150, f"val pool language {lang}: {lang_counts[lang]} < 150"
+    with open(FIXTURES / "val_pool_v2.jsonl", "w") as f:
         for d in pool:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
 

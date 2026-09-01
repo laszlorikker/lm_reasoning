@@ -77,7 +77,9 @@ def extract(source: str, pcfg: dict, stats: Counter):
     elif source == "nli_entailment":
         yield from P.iter_nli_entailment(s["n"], seed)
     elif source == "math_derivation":
-        yield from P.iter_math_derivations(s["n"], seed, split=s.get("split", "train_1M"))
+        yield from P.iter_math_derivations_grouped(
+            s["n"], seed, split=s.get("split", "train_2M"),
+            max_pairs_per_problem=s.get("max_pairs_per_problem", 4))
     else:
         raise KeyError(f"unknown source {source!r}")
 
@@ -187,11 +189,34 @@ def finalize(cfg) -> None:
         k_all.update({int(k): v for k, v in info["k_hist"].items()})
         langs_all.update(info["langs"])
     full = concatenate_datasets(shards).shuffle(seed=cfg.data.pilot["seed"])
+
+    # M1.1 gate: content-hash holdout of every eval source (abstractnet.data.dedup)
+    from abstractnet.data.dedup import load_or_build_eval_hashes, norm_hash
+
+    H = load_or_build_eval_hashes()
+    before = len(full)
+    full = full.filter(
+        lambda r: norm_hash(r["source_text"]) not in H and norm_hash(r["target_text"]) not in H
+    )
+    stripped = {"n": 0}
+
+    def strip_negs(r):
+        keep = [i for i, t in enumerate(r["neg_texts"]) if norm_hash(t) not in H]
+        stripped["n"] += len(r["neg_texts"]) - len(keep)
+        return {"neg_texts": [r["neg_texts"][i] for i in keep],
+                "neg_ids": [r["neg_ids"][i] for i in keep],
+                "neg_spans": [r["neg_spans"][i] for i in keep]}
+
+    full = full.map(strip_negs)
+    dedup = {"eval_hashes": len(H), "removed_pairs": before - len(full),
+             "stripped_negatives": stripped["n"]}
+
     full.save_to_disk(str(OUT / "full"))
     n = len(full)
     k3 = sum(v for k, v in k_all.items() if k >= 3)
     summary = {
         "n_pairs": n,
+        "dedup": dedup,
         "total_tokens_src_tgt": agg["src_tokens"] + agg["tgt_tokens"],
         "multichunk_share_pairs": round(k3 / n, 4),
         "target_multichunk_share": cfg.data.pilot["target_multichunk_share"],
@@ -201,7 +226,7 @@ def finalize(cfg) -> None:
         "per_source": per_source,
     }
     Path("runs/m1").mkdir(parents=True, exist_ok=True)
-    Path("runs/m1/pilot_stats.json").write_text(json.dumps(summary, indent=2))
+    Path(f"runs/m1/{OUT.name}_stats.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps({k: v for k, v in summary.items() if k not in ("per_source", "k_hist", "langs")}, indent=2))
     ok = summary["multichunk_share_pairs"] >= cfg.data.pilot["target_multichunk_share"]
     print(f"K>=3 share {summary['multichunk_share_pairs']:.1%} vs target "
@@ -209,11 +234,14 @@ def finalize(cfg) -> None:
 
 
 def main() -> None:
+    global OUT
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/base.yaml")
     ap.add_argument("--source", default=None, help="build one source shard")
     ap.add_argument("--finalize", action="store_true", help="only concatenate existing shards")
+    ap.add_argument("--out", default=str(OUT), help="corpus root (e.g. data/processed/pilot_v1.1)")
     args = ap.parse_args()
+    OUT = Path(args.out)
     cfg = load_config(args.config)
     if cfg.data.pilot is None:
         raise SystemExit("configs: data.pilot section missing")

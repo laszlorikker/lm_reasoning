@@ -44,6 +44,10 @@ _NUM_WORDS = {
 
 
 def _rule_negation(sent, rng: random.Random) -> str | None:
+    """Negation flip. Insertion is grammar-aware (M1.1): under subject–aux
+    inversion (questions) "not" goes AFTER the subject ("What do you not
+    think…"), never between aux and subject; sentence-initial verbs
+    (imperatives) are skipped — the generator falls back to other rules."""
     s = sent.text
     for t in sent:
         if t.dep_ == "neg":  # remove an existing negation
@@ -55,17 +59,24 @@ def _rule_negation(sent, rng: random.Random) -> str | None:
                 b += 1
             return s[:a] + s[b:]
     root = sent.root
+    subj = next((c for c in root.children if c.dep_ in ("nsubj", "nsubjpass", "expl")), None)
     auxes = [c for c in root.children if c.dep_ in ("aux", "auxpass", "cop")]
     if root.pos_ == "AUX" or (root.pos_ == "VERB" and root.lemma_ == "be"):
-        b = root.idx - sent.start_char + len(root.text)
-        return s[:b] + " not" + s[b:]
-    if auxes:
-        b = auxes[0].idx - sent.start_char + len(auxes[0].text)
-        return s[:b] + " not" + s[b:]
-    if root.pos_ == "VERB":
+        anchor = root
+    elif auxes:
+        anchor = auxes[0]
+    elif root.pos_ == "VERB":
+        if root.i == sent.start:  # imperative / verb-initial: no clean negation
+            return None
         a = root.idx - sent.start_char
         return s[:a] + "never " + s[a:]
-    return None
+    else:
+        return None
+    if subj is not None and subj.i > anchor.i:  # inversion: not after the subject
+        b = max(t.idx + len(t.text) for t in subj.subtree) - sent.start_char
+        return s[:b] + " not" + s[b:]
+    b = anchor.idx - sent.start_char + len(anchor.text)
+    return s[:b] + " not" + s[b:]
 
 
 def _rule_number(sent, rng: random.Random) -> str | None:

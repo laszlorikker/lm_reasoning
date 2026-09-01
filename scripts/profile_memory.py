@@ -83,12 +83,79 @@ def report(tag: str, note: str = "") -> tuple[float, float]:
     return alloc, reserved
 
 
+def profile_train_step(cfg) -> None:
+    """M2: full train-step memory profile — AbstractLM, encoder on (x, x', x⁻),
+    decoder with gradient checkpointing, chunked CE, AdamW8bit states, at the
+    configured batch/seq with the measured M1 K distribution. HARD budget gate
+    with the memory-fraction guard active (an over-budget step raises OOM here
+    instead of silently spilling — M0 finding)."""
+    import bitsandbytes as bnb
+
+    from abstractnet.data.sampling import real_batch
+    from abstractnet.modeling.abstract_lm import AbstractLM
+
+    budget = cfg.profile.vram_budget_gib
+    mem.apply_budget_guard(budget)
+    corpus = next(p for p in ("data/processed/pilot_v1.1/full", "data/processed/pilot_v1/full")
+                  if Path(p).exists())
+    model = AbstractLM(cfg)
+    model.lm.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    model.train()
+    batch = real_batch(corpus, cfg.profile.batch_size, model.tokenizer, seed=5, mixed_k=True)
+    ks = batch["src_z_mask"].sum(1).tolist()
+    pair_tokens = int(batch["src_mask"].sum() + batch["tgt_mask"].sum())
+    neg_tokens = int(batch["neg_mask"].sum())
+    print(f"=== train-step profile: B={cfg.profile.batch_size}, corpus={corpus}, "
+          f"K={ks}, pair_tokens={pair_tokens}, neg_tokens={neg_tokens}, budget={budget:.1f} GiB ===")
+
+    new_p = [p for n, p in model.named_parameters() if p.requires_grad and "lora_" not in n]
+    lora_p = [p for n, p in model.named_parameters() if p.requires_grad and "lora_" in n]
+    opt = bnb.optim.AdamW8bit([{"params": new_p, "lr": 2e-4}, {"params": lora_p, "lr": 1e-4}],
+                              weight_decay=0.01)
+    scaler = torch.amp.GradScaler("cuda")
+
+    def step():
+        out = model(batch)
+        scaler.scale(out["loss"]).backward()
+        scaler.unscale_(opt)
+        torch.nn.utils.clip_grad_norm_(new_p + lora_p, 1.0)
+        scaler.step(opt)
+        scaler.update()
+        opt.zero_grad(set_to_none=True)
+        return out
+
+    try:
+        step()  # warmup: allocator + 8-bit optimiser state materialisation
+        torch.cuda.synchronize()
+        mem.reset_peak()
+        t0 = time.monotonic()
+        for _ in range(2):
+            step()
+        torch.cuda.synchronize()
+        dt = (time.monotonic() - t0) / 2
+    except torch.cuda.OutOfMemoryError as e:
+        print(f"BUDGET EXCEEDED: OOM under the {budget:.1f} GiB guard — {str(e).splitlines()[0]}")
+        sys.exit(1)
+
+    alloc, reserved = report("train step (fwd+bwd+AdamW8bit)", f"{dt:.2f} s/step")
+    print(f"throughput: {pair_tokens / dt:,.0f} pair-tokens/s "
+          f"({(pair_tokens + neg_tokens) / dt:,.0f} incl. negatives)")
+    print(f"\nbudget gate: peak reserved {reserved:.2f} GiB vs {budget:.1f} GiB")
+    if reserved > budget:
+        print("BUDGET EXCEEDED — failing loudly (kickoff rule 4)")
+        sys.exit(1)
+    print("WITHIN BUDGET")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/base.yaml")
-    ap.add_argument("--profile", default="split_forward", choices=["split_forward"])
+    ap.add_argument("--profile", default="split_forward", choices=["split_forward", "train_step"])
     args = ap.parse_args()
     cfg = load_config(args.config)
+    if args.profile == "train_step":
+        profile_train_step(cfg)
+        return
     B, S, budget = cfg.profile.batch_size, cfg.profile.seq_len, cfg.profile.vram_budget_gib
     split = cfg.model.split_layer
 
