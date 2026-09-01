@@ -124,16 +124,23 @@ def invariance(model, pool, vecs) -> dict:
 
 def panel_decodes(model, panel: list[dict]) -> list[dict]:
     """Per panel doc: decodes with correct / swapped / zeroed z (same language),
-    plus cross-lingual decodes for docs with reference translations."""
-    from abstractnet.data.collate import LANGS
-
+    plus cross-lingual decodes. All decoding is batched: per source-language
+    group for the three variants, per TARGET language for cross-lingual (the
+    first smoke ran cross-lingual at B=1 — 64 calls, ~26 min; this groups them
+    into <=6 calls)."""
+    K_MAX = model.cfg.model.k_max
     results = [dict(d) for d in panel]
+    z_of: dict[int, tuple[torch.Tensor, torch.Tensor]] = {}
     by_lang: dict[str, list[int]] = defaultdict(list)
     for i, d in enumerate(panel):
         by_lang[d["lang"]].append(i)
     for lang, idxs in by_lang.items():
         texts = [panel[i]["text"] for i in idxs]
         z, zm, _ = model.encode(texts, [lang] * len(texts))
+        for j, i in enumerate(idxs):  # store per-doc z padded to K_MAX for regrouping
+            pad = K_MAX - z.shape[1]
+            z_of[i] = (torch.nn.functional.pad(z[j: j + 1], (0, 0, 0, pad)),
+                       torch.nn.functional.pad(zm[j: j + 1], (0, pad)))
         variants = {
             "correct": (z, zm),
             "swapped": (torch.roll(z, 1, dims=0), torch.roll(zm, 1, dims=0)),
@@ -143,20 +150,25 @@ def panel_decodes(model, panel: list[dict]) -> list[dict]:
             outs = model.decode(zv, zmv, lang, max_new_tokens=MAX_NEW)
             for i, text in zip(idxs, outs):
                 results[i][f"decode_{name}"] = text
-        # cross-lingual: up to 2 other languages, preferring ones with references
-        for i in idxs:
+    # cross-lingual, grouped by TARGET language: one batched decode per language
+    jobs: dict[str, list[int]] = defaultdict(list)
+    for i, r in enumerate(results):
+        refs = r.get("translations") or {}
+        others = [l for l in refs if l != r["lang"]][:2]
+        others += [l for l in ("en", "fr") if l != r["lang"] and l not in others]
+        r["xling"] = {}
+        for tl in others[:2]:
+            jobs[tl].append(i)
+    for tl, idxs in jobs.items():
+        zs = torch.cat([z_of[i][0] for i in idxs])
+        zms = torch.cat([z_of[i][1] for i in idxs])
+        outs = model.decode(zs, zms, tl, max_new_tokens=MAX_NEW)
+        for i, out in zip(idxs, outs):
             refs = results[i].get("translations") or {}
-            others = [l for l in refs if l != lang][:2]
-            others += [l for l in ("en", "fr") if l != lang and l not in others]
-            results[i]["xling"] = {}
-            for tl in others[:2]:
-                out = model.decode(z[idxs.index(i): idxs.index(i) + 1],
-                                   zm[idxs.index(i): idxs.index(i) + 1], tl,
-                                   max_new_tokens=MAX_NEW)[0]
-                results[i]["xling"][tl] = {
-                    "decode": out,
-                    "chrf_vs_ref": round(chrf(out, refs[tl]), 1) if tl in refs else None,
-                }
+            results[i]["xling"][tl] = {
+                "decode": out,
+                "chrf_vs_ref": round(chrf(out, refs[tl]), 1) if tl in refs else None,
+            }
     return results
 
 
@@ -390,7 +402,7 @@ def generate(model, cfg, run_dir: Path | None, step: int, writer=None,
     panel_vecs = batched_docvecs(model, [d["text"] for d in panel], [d["lang"] for d in panel])
     nn = nearest_neighbours(enc["vecs"], panel_vecs, pool)
 
-    gates = [float(w.gate) for w in model._wrappers()]
+    gates = [float(w.gate.detach()) for w in model._wrappers()]
     hist_path = (run_dir / "val" / "history.jsonl") if run_dir else out_dir / "history.jsonl"
     entry = {"step": step, "auc_hard": inv["auc_hard"], "auc_rand": inv["auc_rand"],
              "eff_rank": enc["eff_rank"], "gates": gates, **panel_scores}

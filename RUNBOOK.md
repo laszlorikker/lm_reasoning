@@ -141,13 +141,36 @@ the panel decodes becoming paraphrases rather than copies or babble.
 - Keep everything on the Linux filesystem (it already is); never move the run
   dir to /mnt/c.
 
-## 7. Expected numbers (from the M3 measurements)
+## 7. Expected numbers (measured in M3, 2026-09-01)
 
-FILLED_FROM_M3_MEASUREMENTS
+- Batch: micro 8 × accumulation 8 = effective 64. (Sweep: micro 8/12/16 all
+  land at ~1,780 pair-tok/s on worst-case docs — the GPU is saturated at 8;
+  micro 8 has the most memory slack: 7.07 GiB reserved of the 14 budget.)
+- Steps per corpus pass: **5,856** (374,834 pairs / 64).
+- Seconds per step: **~11.6** corpus-average (8 micros ≈ 1.45 s each;
+  worst-case 512-token micros run 2.95 s).
+- Throughput: **~740 pair-tokens/s** corpus-average (short documents underfill
+  the GPU; long-doc batches reach ~1,790). One full pass ≈ **~19 h**.
+- A 30-minute window ≈ ~150 steps. An 8-hour overnight ≈ ~2,450 steps ≈ 42%
+  of a pass.
+- Peak training memory ≈ 6.8 GiB allocated (guard armed at 14).
+- Validation report: **~9 min each** (first ever downloads the NLI model once);
+  the auto-interval then lands near ~500 steps, i.e. one report ≈ every 1.6 h.
+- Loss scale settles in the low thousands after ~5 early halvings — that
+  settling is normal, a later downward staircase is not.
+
+## 7b. Sanity numbers from the 200-step smoke (untrained baselines)
+
+AUC hard 0.56 (chance-ish), AUC random 0.99, NLI correct/swapped/zeroed all
+≈ 0.06 (babble), effective rank ≈ 944/1024. Training should pull AUC-hard and
+NLI-correct up and OPEN the correct-vs-swapped/zeroed gap; effective rank
+should not collapse toward low double digits.
 
 ## 8. Disk and housekeeping
 
-- Checkpoints: ~SIZE_MB each; the run keeps the last 3 plus milestones.
+- Checkpoints: **480 MB** each (trainables fp32 + full 8-bit optimiser state);
+  the run keeps the last 3 plus milestones → ~1.5 GB steady state per run.
+  Val reports are ~0.7 MB of self-contained HTML each.
 - `runs/<name>/` holds: checkpoints, `tb/` (TensorBoard), `steps.jsonl`,
   `telemetry.csv`, `val/step_*/report.html`, `config_snapshot.yaml`.
 - Safe to delete: old `runs/_resume_*` (resume-proof artifacts), `runs/preflight`.
