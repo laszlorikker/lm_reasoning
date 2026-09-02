@@ -1,0 +1,19 @@
+#!/bin/sh
+# Guard: nothing over 100 MB ever enters git history; checkpoint/shard
+# extensions are blocked outright. Install once per clone:
+#   git config core.hooksPath scripts/git_hooks
+LIMIT=104857600
+fail=0
+for f in $(git diff --cached --name-only --diff-filter=AM); do
+    case "$f" in
+        *.pt|*.safetensors|*.arrow|*.bin)
+            echo "pre-commit: blocked artifact extension: $f" >&2; fail=1; continue ;;
+    esac
+    size=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+    if [ "$size" -gt "$LIMIT" ]; then
+        echo "pre-commit: $f is $((size / 1048576)) MB (> 100 MB limit)" >&2
+        fail=1
+    fi
+done
+[ "$fail" -eq 0 ] || { echo "pre-commit: refusing commit (use releases for big artifacts)" >&2; exit 1; }
+exit 0
