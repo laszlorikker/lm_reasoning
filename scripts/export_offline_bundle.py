@@ -98,11 +98,24 @@ def main() -> None:
     ap.add_argument("--out", default="/tmp/abstractnet_bundle_out")
     ap.add_argument("--gh", default=str(Path.home() / "bin" / "gh"))
     ap.add_argument("--skip-upload", action="store_true")
+    ap.add_argument("--upload-only", action="store_true",
+                    help="upload existing parts + manifest from --out; no re-staging")
     ap.add_argument("--with-wheelhouse", action="store_true")
     ap.add_argument("--zstd-threads", type=int, default=4,
                     help="politeness cap: the pilot may share this CPU")
     args = ap.parse_args()
     stage, out = Path(args.stage), Path(args.out)
+
+    if args.upload_only:
+        manifest_path = out / f"{args.version}.manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        parts = sorted(out.glob(f"{args.version}.tar.zst.part-*"))
+        assert parts and len(parts) == len(manifest["archives"]), "parts missing vs manifest"
+        for a, p in zip(manifest["archives"], parts):
+            assert p.name == a["name"] and sha256(p) == a["sha256"], f"stale part {p.name}"
+        git_commit = manifest["git_commit"]
+        upload(args, manifest, manifest_path, parts, git_commit)
+        return
 
     files = stage_bundle(stage, args.with_wheelhouse)
     git_commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
@@ -140,7 +153,10 @@ def main() -> None:
     if args.skip_upload:
         print(f"upload skipped; assets in {out}")
         return
+    upload(args, manifest, manifest_path, parts, git_commit)
 
+
+def upload(args, manifest, manifest_path: Path, parts: list[Path], git_commit: str) -> None:
     gh = args.gh
     subprocess.run([gh, "release", "create", args.version, "--title",
                     f"Offline bundle {args.version}", "--notes",
