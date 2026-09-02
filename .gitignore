@@ -7,6 +7,11 @@ __pycache__/
 
 # artifacts: checkpoints, tensorboard, telemetry
 runs/
+*.pt
+*.safetensors
+.env
+.env.*
+.venv/
 
 # generated datasets; small committed fixtures are the exception
 data/*

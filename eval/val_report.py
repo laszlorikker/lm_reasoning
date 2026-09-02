@@ -109,6 +109,8 @@ def invariance(model, pool, vecs) -> dict:
     pos_pairs = [(i, d["paraphrase"], d["lang"]) for i, d in enumerate(pool) if d["paraphrase"]]
     neg_pairs = [(i, n["text"], d["lang"]) for i, d in enumerate(pool)
                  for n in d["hard_negatives"][:1]]
+    neg_meta = [(n.get("kind"), n.get("rule")) for d in pool
+                for n in d["hard_negatives"][:1]]
     para_vecs = batched_docvecs(model, [p[1] for p in pos_pairs], [p[2] for p in pos_pairs])
     neg_vecs = batched_docvecs(model, [p[1] for p in neg_pairs], [p[2] for p in neg_pairs])
     cos_pos = np.array([float(vecs[i] @ v) for (i, _, _), v in zip(pos_pairs, para_vecs)])
@@ -119,7 +121,7 @@ def invariance(model, pool, vecs) -> dict:
     neg_owner = [i for (i, _, _) in neg_pairs]
     return {"cos_pos": cos_pos, "cos_neg": cos_neg, "cos_rand": cos_rand,
             "auc_hard": auc(cos_pos, cos_neg), "auc_rand": auc(cos_pos, cos_rand),
-            "neg_owner": neg_owner, "neg_vecs": neg_vecs}
+            "neg_owner": neg_owner, "neg_vecs": neg_vecs, "neg_meta": neg_meta}
 
 
 def panel_decodes(model, panel: list[dict]) -> list[dict]:
@@ -336,15 +338,20 @@ def render_html(out_dir: Path, step: int, plots, panel_results, nn, inv, pool,
 </table></details>""")
 
     worst = sorted(panel_results, key=lambda r: r["nli_correct"])[:10]
-    fail1 = "".join(f"<tr><td>{r['id']}</td><td>{r['nli_correct']}</td>"
-                    f"<td>{esc(r['text'][:140])}</td><td>{esc(r['decode_correct'][:140])}</td></tr>"
-                    for r in worst)
+    fail1 = "".join(
+        f"<tr><td>{r['id']}</td><td>{esc(str(r.get('role', '')))}</td>"
+        f"<td>{r.get('k_est', '?')}</td><td>{r['nli_correct']}</td>"
+        f"<td>{esc(r['text'][:140])}</td><td>{esc(r['decode_correct'][:140])}</td></tr>"
+        for r in worst)
     order = np.argsort(-np.array([float(v) for v in
                                   (inv["cos_neg"] if len(inv["cos_neg"]) else [0.0])]))[:10]
     fail2 = ""
     for j in order:
         i = inv["neg_owner"][j]
-        fail2 += (f"<tr><td>{pool[i]['id']}</td><td>{inv['cos_neg'][j]:.3f}</td>"
+        kind, rule = inv["neg_meta"][j]
+        fail2 += (f"<tr><td>{pool[i]['id']}</td><td>{esc(str(kind))}</td>"
+                  f"<td>{esc(str(rule))}</td><td>{pool[i].get('k_est', '?')}</td>"
+                  f"<td>{inv['cos_neg'][j]:.3f}</td>"
                   f"<td>{esc(pool[i]['text'][:140])}</td>"
                   f"<td>{esc(pool[i]['hard_negatives'][0]['text'][:140])}</td></tr>")
 
@@ -362,9 +369,9 @@ random {inv['auc_rand']:.3f} &nbsp;|&nbsp; NLI model: {panel_scores['nli_model']
 {''.join(img_tag(png, t) for t, png in plots)}
 <h2>Examples panel (32 fixed docs)</h2>{''.join(rows)}
 <h2>Failure: 10 lowest-NLI reconstructions (panel)</h2>
-<table class='fail'><tr><th>id</th><th>NLI</th><th>source</th><th>decode</th></tr>{fail1}</table>
+<table class='fail'><tr><th>id</th><th>role</th><th>K</th><th>NLI</th><th>source</th><th>decode</th></tr>{fail1}</table>
 <h2>Failure: 10 hard negatives closest to their source (pool)</h2>
-<table class='fail'><tr><th>id</th><th>cos</th><th>source</th><th>negative</th></tr>{fail2}</table>
+<table class='fail'><tr><th>id</th><th>kind</th><th>rule</th><th>K</th><th>cos</th><th>source</th><th>negative</th></tr>{fail2}</table>
 <p><i>timings: {esc(json.dumps(timings))}</i></p>"""
     out = out_dir / "report.html"
     out.write_text(html)
@@ -500,12 +507,15 @@ def main() -> None:
     ap.add_argument("--run", default=None, help="run dir for history/telemetry plots")
     ap.add_argument("--step", type=int, default=None)
     ap.add_argument("--milestone", action="store_true")
+    ap.add_argument("--pool", default=None, help="override cfg.data.val_pool_path")
     args = ap.parse_args()
 
     from abstractnet.config import load_config
     from abstractnet.modeling.abstract_lm import AbstractLM
 
     cfg = load_config(args.config)
+    if args.pool:
+        cfg.data.val_pool_path = args.pool
     payload = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     model = AbstractLM(cfg)
     state = payload.get("trainable", payload.get("state"))

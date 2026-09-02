@@ -47,6 +47,9 @@ class AbstractLM(nn.Module):
         mc = cfg.model
         assert list(mc.languages) == LANGS, "config languages must match collate.LANGS order"
         self.lm, self.tokenizer = load_base_lm(mc, device=device)
+        from abstractnet.utils.load import DTYPES
+
+        self._act_dtype = DTYPES[mc.dtype]  # autocast dtype follows the config
         self.lm.requires_grad_(False)
         self.split = mc.split_layer
         self.n_layers = self.lm.config.num_hidden_layers
@@ -170,7 +173,7 @@ class AbstractLM(nn.Module):
         """Full training step losses on a collated batch (M2 spec §5)."""
         tc = self.cfg.train
         dev = self.device_
-        with torch.autocast("cuda", dtype=torch.float16):
+        with torch.autocast("cuda", dtype=self._act_dtype):
             groups = [(batch["src_ids"].to(dev), batch["src_chunk_mask"].to(dev)),
                       (batch["tgt_ids"].to(dev), batch["tgt_chunk_mask"].to(dev))]
             has_neg = batch["neg_ids"].shape[0] > 0
@@ -242,7 +245,7 @@ class AbstractLM(nn.Module):
             for k, (s, e) in enumerate(d.spans):
                 cm[i, k, s:e] = True
                 zm[i, k] = True
-        with torch.autocast("cuda", dtype=torch.float16):
+        with torch.autocast("cuda", dtype=self._act_dtype):
             z = self.encode_ids(ids.to(self.device_), cm.to(self.device_))
         return z.float(), zm.to(self.device_), [d.spans for d in docs]
 
@@ -252,10 +255,10 @@ class AbstractLM(nn.Module):
         B = z.shape[0]
         lang_idx = torch.full((B,), LANGS.index(lang), device=self.device_, dtype=torch.long)
         eos = self.tokenizer.eos_token_id
-        with torch.autocast("cuda", dtype=torch.float16):
+        with torch.autocast("cuda", dtype=self._act_dtype):
             self._set_z(z.to(self.device_), z_mask.to(self.device_))
             emb = self.lang_table(lang_idx).unsqueeze(1)
-            out = self.lm.model(inputs_embeds=emb.half(), use_cache=True)
+            out = self.lm.model(inputs_embeds=emb.to(self._act_dtype), use_cache=True)
             past = out.past_key_values
             tokens, finished = [], torch.zeros(B, dtype=torch.bool, device=self.device_)
             next_id = self.lm.lm_head(out.last_hidden_state[:, -1]).argmax(-1)
@@ -281,7 +284,7 @@ class AbstractLM(nn.Module):
         B, T = target_ids.shape
         lang_idx = torch.full((B,), LANGS.index(lang), device=self.device_, dtype=torch.long)
         mask = torch.ones_like(target_ids, dtype=torch.bool)
-        with torch.autocast("cuda", dtype=torch.float16):
+        with torch.autocast("cuda", dtype=self._act_dtype):
             hidden = self.decoder_hidden(target_ids.to(self.device_), mask.to(self.device_),
                                          lang_idx, z.to(self.device_), z_mask.to(self.device_),
                                          word_dropout=False)

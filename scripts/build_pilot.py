@@ -124,6 +124,11 @@ def pack(examples: list, tok, dcfg, stats: Counter, k_hist: Counter, langs: Coun
             if nd is None or nd.n_dropped_tokens > 0:
                 stats["neg_dropped"] += 1
                 continue
+            if nd.input_ids == doc.input_ids:
+                # v1.3 guard: model-invisible negative (identical capped ids —
+                # tokenizer-level collision or out-of-window perturbation)
+                stats["neg_identical_dropped"] += 1
+                continue
             neg_texts.append(ntext)
             neg_ids.append(nd.input_ids)
             neg_spans.append([x for span in nd.spans for x in span])

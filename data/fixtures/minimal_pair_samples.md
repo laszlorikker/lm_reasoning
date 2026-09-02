@@ -1,342 +1,326 @@
 # Minimal-pair audit — 20 samples per rule
 
-Seeded sample of 2000 en sources from data/processed/pilot_v1.1/full; chrF(x⁻ vs x) — high = surface-close (good minimal pair).
+Seeded sample of 2000 en sources from data/processed/pilot_v1.3/full; chrF(x⁻ vs x) — high = surface-close (good minimal pair).
 
 
-## arg_swap (n=976, chrF mean 91.58, p10 75.68, min 36.41)
+## arg_swap (n=1005, chrF mean 91.99, p10 77.81, min 34.56)
 
-- chrF 99.5 (sent 4)
-  - x: Mr President, we all know that the consequences of the tragic flood disaster in Mozambique would have been less serious if the more developed countries, and especially the countries of the European Union, which has a special responsibility for the former Portuguese colony, had reacted immediately by
-  - x⁻: Mr President, we all know that the consequences of the tragic flood disaster in Mozambique would have been less serious if the more developed countries, and especially the countries of the European Union, which has a special responsibility for the former Portuguese colony, had reacted immediately by
-- chrF 98.9 (sent 0)
-  - x: I also welcome the Commission statement that subsidies have now ceased. When we look at the choice of routings and so on for the consumer, air fares have come down considerably over the last few years. Fares from the UK are amongst some of the lowest, showing what effect having three major carriers 
-  - x⁻: the Commission statement that subsidies have now ceased also welcome I. When we look at the choice of routings and so on for the consumer, air fares have come down considerably over the last few years. Fares from the UK are amongst some of the lowest, showing what effect having three major carriers 
+- chrF 100.0 (sent 2)
+  - x: What is Balaji Viswanathan's opinion on the Indian Prime Minister Modi's new policy about illegalization of 500 and 1000 currency notes? Is it actually possible to travel through time? How can I make my money make money? What are the most embarrassing moments in life?
+  - x⁻: What is Balaji Viswanathan's opinion on the Indian Prime Minister Modi's new policy about illegalization of 500 and 1000 currency notes? Is it actually possible to travel through time? How can I make money make my money? What are the most embarrassing moments in life?
+- chrF 98.9 (sent 5)
+  - x: We believe that it is right that the directive does not apply to public broadcasting organisations, in view of their specific nature, which cannot be divorced from the democratic, social and cultural needs of the various Member States, and the negative impact that this would have on their ability to
+  - x⁻: We believe that it is right that the directive does not apply to public broadcasting organisations, in view of their specific nature, which cannot be divorced from the democratic, social and cultural needs of the various Member States, and the negative impact that this would have on their ability to
 - chrF 98.7 (sent 2)
-  - x: I must take this opportunity to say that I do not approve of the growing frequency with which we resort to this type of line! I imagine that this is what led the rapporteur to "take note" of the Commission' s proposal, without actually putting it into practice. The report proposes that we establish 
-  - x⁻: I must take this opportunity to say that I do not approve of the growing frequency with which we resort to this type of line! I imagine that this is what led the rapporteur to "take note" of the Commission' s proposal, without actually putting it into practice. The report proposes that a trialogue b
-- chrF 98.5 (sent 4)
-  - x: I can only repeat that, if the question of the division of land is again discussed in the Council - and this was an important issue in the Committee on Agriculture - then the Commission is of course open to suggestions. However, as the Commissioner for the budget, I am bound to say that a solution m
-  - x⁻: I can only repeat that, if the question of the division of land is again discussed in the Council - and this was an important issue in the Committee on Agriculture - then the Commission is of course open to suggestions. However, as the Commissioner for the budget, I am bound to say that a solution m
-- chrF 98.3 (sent 0)
-  - x: Let's denote the radius of the inscribed circle as $r$. Since the radius of the circumscribed circle is twice that of the inscribed circle, the radius of the circumscribed circle is $2r$.
-
-The area of a circle is given by the formula $A = \pi r^2$.
-
-The area of the inscribed circle is $A_{in} = \pi 
-  - x⁻: Let's denote the radius of the inscribed circle as $r$. Since the radius of the circumscribed circle is twice that of the inscribed circle, the radius of the circumscribed circle is $2r$.
-
-The area of a circle is given by the formula $A = \pi r^2$.
-
-The area of the inscribed circle is $A_{in} = \pi 
-- chrF 98.2 (sent 2)
-  - x: The current crisis shows how far we have come from that model. Financial globalization, in particular, played havoc with the old rules. When Chinese-style capitalism met American-style capitalism, with few safety valves in place, it gave rise to an explosive mix. There were no protective mechanisms 
-  - x⁻: The current crisis shows how far we have come from that model. Financial globalization, in particular, played havoc with the old rules. When Chinese-style capitalism met American-style capitalism, with few safety valves in place, rise gave it to an explosive mix. There were no protective mechanisms 
+  - x: The nuclear power station in Temelin is being commissioned earlier than was agreed or was expected, and it is not intended to carry out the environmental impact assessment until some time after the fuel elements have been installed, making it a pointless exercise. This is also happening against the 
+  - x⁻: The nuclear power station in Temelin is being commissioned earlier than was agreed or was expected, and it is not intended to carry out the environmental impact assessment until some time after the fuel elements have been installed, making it a pointless exercise. This is also happening against the 
+- chrF 98.6 (sent 0)
+  - x: The countries which are not currently members of the Monetary Union have the right, like other Member States, to information campaigns. This will clearly happen, as long as those countries want it to happen. Two of them, for the moment, Denmark and the United Kingdom, have not shown any interest in 
+  - x⁻: The right have the countries which are not currently members of the Monetary Union, like other Member States, to information campaigns. This will clearly happen, as long as those countries want it to happen. Two of them, for the moment, Denmark and the United Kingdom, have not shown any interest in 
+- chrF 98.4 (sent 1)
+  - x: China is rife with overinvestment in physical capital, infrastructure, and property. To a visitor, this is evident in sleek but empty airports and bullet trains (which will reduce the need for the 45 planned airports), highways to nowhere, thousands of colossal new central and provincial government 
+  - x⁻: China is rife with overinvestment in physical capital, infrastructure, and property. To a visitor, this is evident in sleek but empty airports and bullet trains (the need for the 45 planned airports will reduce which), highways to nowhere, thousands of colossal new central and provincial government 
+- chrF 98.2 (sent 3)
+  - x: Are there any circumstances where the Commission would seek to use qualified majority voting on any of those issues? Can you guarantee that the Commission will not use qualified majority voting on any of those issues? Mr President, I can imagine that according to some Members, the citizens are sensi
+  - x⁻: Are there any circumstances where the Commission would seek to use qualified majority voting on any of those issues? Can you guarantee that the Commission will not use qualified majority voting on any of those issues? Mr President, I can imagine that according to some Members, the citizens are sensi
 - chrF 98.0 (sent 2)
-  - x: New laws will not change the hearts and minds of the people of Europe. What we need is education, time and confidence building in a spirit of cooperation between the various ethnic communities. We have in our own group two ethnic Members of the Conservative delegation who are extremely active and pr
-  - x⁻: New laws will not change the hearts and minds of the people of Europe. What we need is education, time and confidence building in a spirit of cooperation between the various ethnic communities. two ethnic Members of the Conservative delegation who are extremely active and proud to be British Conserv
-- chrF 97.7 (sent 1)
-  - x: The fact is that men gather shellfish at sea and using technology, albeit basic, and women gather shellfish on foot using a hoe. Approximately 10 000 women in Galicia extract carpetshells, as shellfish are not fished but rather extracted. These women work in a self-sacrificing way, working long days
-  - x⁻: The fact is that men gather shellfish at sea and using technology, albeit basic, and women gather shellfish on foot using a hoe. carpetshells extract Approximately 10 000 women in Galicia, as shellfish are not fished but rather extracted. These women work in a self-sacrificing way, working long days
-- chrF 97.3 (sent 1)
-  - x: Let's break it down:
+  - x: The bird flies over the forest and is joined by 5 parrots, for a total of 1 + 5 = 6 birds.
+Then, 3 squirrels join each of the 5 parrots, for a total of 3 * 5 = 15 squirrels.
+Next, 2 owls join each of the 15 squirrels, for a total of 2 * 15 = 30 owls.
+Thus, the total number of animals flying or movin
+  - x⁻: The bird flies over the forest and is joined by 5 parrots, for a total of 1 + 5 = 6 birds.
+Then, 3 squirrels join each of the 5 parrots, for a total of 3 * 5 = 15 squirrels.
+Next, each of the 15 squirrels join 2 owls, for a total of 2 * 15 = 30 owls.
+Thus, the total number of animals flying or movin
+- chrF 97.7 (sent 3)
+  - x: In recent years, many experts and commentators have said that the Atlantic Alliance would crumble or become irrelevant. As a former ambassador to the North Atlantic Treaty Organization (NATO), I can say from experience that such dire predictions are nothing new. As America’s current Secretary of Def
+  - x⁻: In recent years, many experts and commentators have said that the Atlantic Alliance would crumble or become irrelevant. As a former ambassador to the North Atlantic Treaty Organization (NATO), I can say from experience that such dire predictions are nothing new. As America’s current Secretary of Def
+- chrF 97.4 (sent 0)
+  - x: Many observers believe that cream skimmers in the United States would serve cities and leave rural areas to the universal service provider because they assume that the cost of delivery to rural areas is much higher than the cost of delivery to cities.
+  - x⁻: Many observers believe that cities would serve cream skimmers in the United States and leave rural areas to the universal service provider because they assume that the cost of delivery to rural areas is much higher than the cost of delivery to cities.
+- chrF 97.0 (sent 2)
+  - x: Let's determine the total number of spins for both Emily and her brother.
+For Emily, 6 tops spinning 90 times each gives 6 * 90 = 540 total spins.
+For her brother, 5 tops spinning 120 times each gives 5 * 120 = 600 total spins.
+Comparing the total number of spins, 600 is greater than 540.
+Thus, Emil
+  - x⁻: Let's determine the total number of spins for both Emily and her brother.
+For Emily, 6 tops spinning 90 times each gives 6 * 90 = 540 total spins.
+5 * 120 = 600 total spins each gives For her brother, 5 tops spinning 120 times.
+Comparing the total number of spins, 600 is greater than 540.
+Thus, Emil
+- chrF 96.4 (sent 3)
+  - x: What business would/could you start right now with $100? How can I have a more defined jawline? Why do panda bears like to eat bamboo? How can I stop my porn addiction? What could be Donald Trump's secret plan on taking down ISIS? How much equity should I get as CTO/co-founder?
+  - x⁻: What business would/could you start right now with $100? How can I have a more defined jawline? Why do panda bears like to eat bamboo? How can my porn addiction stop I? What could be Donald Trump's secret plan on taking down ISIS? How much equity should I get as CTO/co-founder?
+- chrF 95.6 (sent 0)
+  - x: Is it true that the new Rs. 2000 currency notes in India will have a nano GPS chip? How do zooplankton and phytoplankton compare and contrast? How do I lose stubborn belly fat? Why did Donald Trump blame Hillary and Obama for violence at his rallies? How can I study law after B.Com?
+  - x⁻: Is it true that a nano GPS chip will have the new Rs. 2000 currency notes in India? How do zooplankton and phytoplankton compare and contrast? How do I lose stubborn belly fat? Why did Donald Trump blame Hillary and Obama for violence at his rallies? How can I study law after B.Com?
+- chrF 94.8 (sent 1)
+  - x: Since John buys 2 dozen cookies, he has a total of $2 * 12 = 24$ cookies.
+He then eats 3 cookies, so the number of cookies he has left is $24 - 3 = 21$.
+Thus, John has \boxed{21} cookies left.
+  - x⁻: Since John buys 2 dozen cookies, he has a total of $2 * 12 = 24$ cookies.
+He then eats 3 cookies, so the number of cookies he has left is $24 - 3 = 21$.
+Thus, \boxed{21} cookies left has John.
+- chrF 93.8 (sent 3)
+  - x: In place of the word 'exceeded' it says 'reached' , which is the opposite. Thank you. Everyone is now clear on this. (Parliament adopted the legislative resolution)
+  - x⁻: In place of the word 'exceeded' it says 'reached' , which is the opposite. Thank you. Everyone is now clear on this. (the legislative resolution adopted Parliament)
+- chrF 92.6 (sent 0)
+  - x: i'm always explaining to people i do little things like that like you know take the stairs instead of the um the elevator and
+  - x⁻: i'm always explaining to people little things like that do i like you know take the stairs instead of the um the elevator and
+- chrF 90.3 (sent 0)
+  - x: I'm sucking wind, and he's rolling in it with that fucking Christ-killer.
+  - x⁻: wind'm sucking I, and he's rolling in it with that fucking Christ-killer.
+- chrF 87.3 (sent 0)
+  - x: Her memories stretch back over one hundred years.
+  - x⁻: over one hundred years stretch back Her memories.
+- chrF 83.1 (sent 0)
+  - x: Even the New Town had very set boundaries.
+  - x⁻: very set boundaries had Even the New Town.
+- chrF 78.5 (sent 0)
+  - x: Maybe I should hire you to handle my affairs.
+  - x⁻: Maybe you should hire I to handle my affairs.
+- chrF 70.3 (sent 0)
+  - x: How do I overcome harry potter?
+  - x⁻: How do harry potter overcome I?
 
-Alex sent 150 promotional emails to subscribers within his city.
-He sent three times that number to subscribers in other cities, which is 3 * 150 = 450.
-
-To find the total number of promotional emails he has sent so far, we add the number of emails sent to subscribers within hi
-  - x⁻: Let's break it down:
-
-150 promotional emails sent Alex to subscribers within his city.
-He sent three times that number to subscribers in other cities, which is 3 * 150 = 450.
-
-To find the total number of promotional emails he has sent so far, we add the number of emails sent to subscribers within hi
-- chrF 96.9 (sent 1)
-  - x: To find the total number of legs and fins, we need to count the legs of the frogs and the fins of the fish and then add them up.
-
-Since each frog has 4 legs and there are 5 frogs, the total number of legs is $5 * 4 = 20$.
-
-Since each fish has 2 fins and there are 20 fish, the total number of fins is
-  - x⁻: To find the total number of legs and fins, we need to count the legs of the frogs and the fins of the fish and then add them up.
-
-Since 4 legs has each frog and there are 5 frogs, the total number of legs is $5 * 4 = 20$.
-
-Since each fish has 2 fins and there are 20 fish, the total number of fins is
-- chrF 96.2 (sent 0)
-  - x: We chose the economically most efficient measures which include the cleaner fuel specifications that we are proposing to bring into force in the year 2000.
-  - x⁻: the economically most efficient measures which include the cleaner fuel specifications that we are proposing to bring into force in the year 2000 chose We.
-- chrF 95.4 (sent 1)
-  - x: I suggest that such a declaration is not necessary when voting. When Members are speaking in debate, either in committee or in plenary, they should declare an interest, but that should not prevent them from voting on a subject. I do not want to have a debate on this.
-  - x⁻: I suggest that such a declaration is not necessary when voting. When Members are speaking in debate, either in committee or in plenary, an interest should declare they, but that should not prevent them from voting on a subject. I do not want to have a debate on this.
-- chrF 94.5 (sent 0)
-  - x: How should I increase my height? What programming languages are best to learn? How do I know that I am a psychopath? How I hack Facebook account? How do I prepare for software interviews?
-  - x⁻: How should my height increase I? What programming languages are best to learn? How do I know that I am a psychopath? How I hack Facebook account? How do I prepare for software interviews?
-- chrF 93.5 (sent 0)
-  - x: Our powerful, multipurpose computers will continue to become even more powerful, but as they acquire new skills--like voice recognition--their appeal will be limited by their price.
-  - x⁻: Our powerful, multipurpose computers will continue to become even more powerful, but as new skills--like voice recognition acquire they--their appeal will be limited by their price.
-- chrF 92.3 (sent 0)
-  - x: The University of Michigan thinks so, and on the weekend of April 9, it gathered an array of dissidents, Communists, and priests to make the case.
-  - x⁻: The University of Michigan thinks so, and on the weekend of April 9, an array of dissidents, Communists, and priests gathered it to make the case.
-- chrF 90.4 (sent 0)
-  - x: Ray sees the sights with Nina and wants to marry him , so she asks her father for permission .
-  - x⁻: the sights with Nina sees Ray and wants to marry him , so she asks her father for permission .
-- chrF 87.1 (sent 0)
-  - x: Torchlight painted the walls orange and shadows shifted in the darkness.
-  - x⁻: the walls painted Torchlight orange and shadows shifted in the darkness.
-- chrF 84.1 (sent 0)
-  - x: I hear you, she said by way of introduction.
-  - x⁻: you hear I, she said by way of introduction.
-- chrF 78.4 (sent 0)
-  - x: Which fictional character do you identify most with?
-  - x⁻: Most do you identify which fictional character with?
-- chrF 71.3 (sent 0)
-  - x: - I don't respect you any more.
-  - x⁻: - you don't respect I any more.
-
-## entity_swap (n=305, chrF mean 94.51, p10 88.54, min 68.92)
+## entity_swap (n=282, chrF mean 94.74, p10 89.67, min 64.54)
 
 - chrF 100.0 (sent 0)
-  - x: The station is adjacent to Kintetsu Nagoya Line , the terminal of the Nagoya Railroad , and Kintetsu Nagoya Station , the terminal of the Meitetsu Nagoya Station .
-  - x⁻: The station is adjacent to Kintetsu Nagoya Station , the terminal of the Nagoya Railroad , and Kintetsu Nagoya Line , the terminal of the Meitetsu Nagoya Station .
-- chrF 99.2 (sent 1)
-  - x: But appeasement of China for commercial gain apparently is not considered morally repellent. How else could Liu Binjie, China’s censor-in-chief and the point man for silencing the Nobel laureate writer and human-rights activist Liu Xiaobo, be invited to lead a delegation of 21 officially sanctioned 
-  - x⁻: But appeasement of China for commercial gain apparently is not considered morally repellent. How else could Liu Xiaobo, China’s censor-in-chief and the point man for silencing the Nobel laureate writer and human-rights activist Liu Binjie, be invited to lead a delegation of 21 officially sanctioned 
-- chrF 99.1 (sent 1)
-  - x: For one thing, it will determine whether the Portuguese Presidency will go down in history as the presidency which upheld the wrongful decision on the part of those 14 Member States against Austria, or, instead, as the presidency which found a way out of this unfortunate period of disregard for Euro
-  - x⁻: For one thing, it will determine whether the Portuguese Presidency will go down in history as the presidency which upheld the wrongful decision on the part of those 14 Member States against Austria, or, instead, as the presidency which found a way out of this unfortunate period of disregard for Euro
-- chrF 98.8 (sent 1)
-  - x: This property boom resembled Japan's in the late 1980s, which ended in a bust that led to a protracted period of anemic growth and deflation from which the country is still struggling to escape. With China's per capita income amounting to only a quarter of Japan's during its boom, the risks the coun
-  - x⁻: This property boom resembled Japan's in the late 1980s, which ended in a bust that led to a protracted period of anemic growth and deflation from which the country is still struggling to escape. With Japan's per capita income amounting to only a quarter of China's during its boom, the risks the coun
-- chrF 98.6 (sent 0)
-  - x: Setiap negara bisa menguatkan keamanan energinya dengan berinvestasi pada kapasitas industrial yang diperlukan untuk membuat turbin angin, sel surya/fotovoltaik, dan sumber-sumber energi terbarukan lainnya semaksimal mungkin. Ketika Tiongkok dan India mengerahkan economic weight mereka ke dalam revo
-  - x⁻: dengan berinvestasi negara bisa menguatkan keamanan energinya Setiap pada kapasitas industrial yang diperlukan untuk membuat turbin angin, sel surya/fotovoltaik, dan sumber-sumber energi terbarukan lainnya semaksimal mungkin. Ketika Tiongkok dan India mengerahkan economic weight mereka ke dalam revo
-- chrF 98.3 (sent 1)
-  - x: There are quite a few different ideas and quite a few misconceptions, because if Mr García-Margallo y Marfil tells me that the European Parliament does not want to give up any of the powers it has only recently acquired, then I naturally share his view. I myself have been a Member of Parliament for 
-  - x⁻: There are quite a few different ideas and quite a few misconceptions, because if Mr García-Margallo y Marfil tells me that the European Parliament does not want to give up any of the powers it has only recently acquired, then I naturally share his view. I myself have been a Member of Marfil for a lo
-- chrF 98.1 (sent 0)
-  - x: Some speculate that one reason Xi may have tapped former Vice Premier Wang Qishan to lead the fight against corruption is that he and his wife have no children – no grasping offspring to compromise his efforts. Xi plainly has no intention of changing China’s political culture, even though it leans a
-  - x⁻: Some speculate that one reason Wang Qishan may have tapped former Vice Premier Xi to lead the fight against corruption is that he and his wife have no children – no grasping offspring to compromise his efforts. Xi plainly has no intention of changing China’s political culture, even though it leans a
-- chrF 97.8 (sent 0)
-  - x: I wonder why this Parliament does not call upon Sri Lanka to hold a referendum as well, along the lines of the referendum held in East Timor, and to abide by the result. Mr President, I yield to no one in my desire for peace in Sir Lanka and in my condemnation of all violence. However, I say to Mrs 
-  - x⁻: I wonder why this Parliament does not call upon East Timor to hold a referendum as well, along the lines of the referendum held in Sri Lanka, and to abide by the result. Mr President, I yield to no one in my desire for peace in Sir Lanka and in my condemnation of all violence. However, I say to Mrs 
-- chrF 97.5 (sent 0)
-  - x: Not eligible - members of the Canadian Forces are not considered to be persons employed in the Public Service, therefore they are not eligible for appointment through internal processes. f) a person appointed to a position in Department "A" in Montreal, Quebec by the Governor in Council:
-  - x⁻: Not eligible - members of the Public Service are not considered to be persons employed in the Canadian Forces, therefore they are not eligible for appointment through internal processes. f) a person appointed to a position in Department "A" in Montreal, Quebec by the Governor in Council:
-- chrF 96.9 (sent 2)
-  - x: Think of all those T-bone steaks. Bush’s partial explanation of the world food crisis, accurate as far as it went, brought the anger of India’s media and of many politicians down on his head. According to India’s Defense Minister, A.K. Anthony, presumably an expert on butter as well as guns, Bush’s 
-  - x⁻: Think of all those T-bone steaks. Bush’s partial explanation of the world food crisis, accurate as far as it went, brought the anger of India’s media and of many politicians down on his head. According to India’s Defense Minister, Bush, presumably an expert on butter as well as guns, A.K. Anthony’s 
-- chrF 96.2 (sent 0)
-  - x: Federal Communications Commission (FCC) has carried out a consultation to implement BPL and recently established technical and operational rules for BPL systems.
-  - x⁻: FCC (Federal Communications Commission) has carried out a consultation to implement BPL and recently established technical and operational rules for BPL systems.
-- chrF 95.3 (sent 0)
-  - x: What would happen if all the huge tech companies (Google, Apple, Microsoft, Facebook, Oracle, Tesla, etc) merged into one tech supercompany?
-  - x⁻: What would happen if all the huge tech companies (Apple, Google, Microsoft, Facebook, Oracle, Tesla, etc) merged into one tech supercompany?
-- chrF 94.5 (sent 0)
-  - x: Congress stepped in Thursday to pass a $19 million appropriation for Legal Services Corp., which serves the legal needs of the poor through state programs nationwide.
-  - x⁻: Legal Services Corp. stepped in Thursday to pass a $19 million appropriation for Congress, which serves the legal needs of the poor through state programs nationwide.
-- chrF 93.9 (sent 1)
-  - x: How can the universe be expanding faster than the speed of light? What is the reason behind firing of Cyrus Mistry from TATA group? Is the idol in the Tirupati Temple actually the idol of a Jain God?
-  - x⁻: How can the universe be expanding faster than the speed of light? What is the reason behind firing of TATA from Cyrus Mistry group? Is the idol in the Tirupati Temple actually the idol of a Jain God?
-- chrF 93.0 (sent 0)
-  - x: The 13th World Cup season began in December 1978 in Japan and concluded in March 1979 in Austria .
-  - x⁻: The 13th World Cup season began in December 1978 in Austria and concluded in March 1979 in Japan .
-- chrF 91.8 (sent 0)
-  - x: In 2012 , for Italian progressive group Karnya , Francesca Naccarelli made some violins arrangements and the singer Claudio Nigris is guest in a song .
-  - x⁻: In 2012 , for Italian progressive group Karnya , Claudio Nigris made some violins arrangements and the singer Francesca Naccarelli is guest in a song .
-- chrF 91.2 (sent 0)
-  - x: " Legend " was released on DVD and Blu-ray on January 25 , 2016 in the USA and on March 1 , 2016 in the United Kingdom .
-  - x⁻: " Legend " was released on DVD and Blu-ray on January 25 , 2016 in the the United Kingdom and on March 1 , 2016 in USA .
-- chrF 90.0 (sent 0)
-  - x: In Jin Yong 's " Wuxia " novel " The legend of the Condor hero " Guo Jing is the ancestor of the protagonist Guo Sheng .
-  - x⁻: In Guo Jing " Wuxia " novel " The legend of the Condor hero " Jin Yong 's is the ancestor of the protagonist Guo Sheng .
-- chrF 88.9 (sent 0)
-  - x: Chaumugra oil, Hastings, was once the Only treatment for Leprosy.
-  - x⁻: Leprosy oil, Hastings, was once the Only treatment for Chaumugra.
-- chrF 87.4 (sent 0)
-  - x: In 1955 , the United Kingdom followed , in 1964 Katsuaki Asai Germany and in 1965 Hiroshi Tada Italy .
-  - x⁻: In 1955 , Katsuaki Asai Germany followed , in 1964 the United Kingdom and in 1965 Hiroshi Tada Italy .
-
-## negation (n=2775, chrF mean 95.68, p10 88.35, min 32.69)
-
-- chrF 99.9 (sent 4)
-  - x: Confining oneself to discussing merely the issue of flags of convenience is dodging the main issue. Whatever the flag of convenience used by Total, the oil company responsible is widely known and represented in all the countries of the European Union and the authorities concerned could, if they were
-  - x⁻: Confining oneself to discussing merely the issue of flags of convenience is dodging the main issue. Whatever the flag of convenience used by Total, the oil company responsible is widely known and represented in all the countries of the European Union and the authorities concerned could, if they were
-- chrF 99.6 (sent 1)
-  - x: I do not want to debate the content now but I do want to ask that this be maintained on the agenda, because after what has happened over the weekend, there is still a risk of considerable discrimination against one ethnic group in Fiji. There is no confidence that the constitution will be applied pr
-  - x⁻: I do not want to debate the content now but I do want to ask that this be maintained on the agenda, because after what has happened over the weekend, there is still a risk of considerable discrimination against one ethnic group in Fiji. There is not no confidence that the constitution will be applie
-- chrF 99.5 (sent 2)
-  - x: The ecological disaster is a major one, possibly unprecedented in scale. Large-scale degassing proliferates and the 16 000 tonnes of tar remaining in the wreck at a depth of 120 m present a major risk of fresh pollution. All workers in the fishing, fish farming and aquaculture sectors have already b
-  - x⁻: The ecological disaster is a major one, possibly unprecedented in scale. Large-scale degassing proliferates and the 16 000 tonnes of tar remaining in the wreck at a depth of 120 m present a major risk of fresh pollution. All workers in the fishing, fish farming and aquaculture sectors have not alrea
-- chrF 99.4 (sent 0)
-  - x: It is a paradox, indeed, that all candidates in Bolivia promise social and economic change when they all are basically looking at the past for inspiration and are in thrall to the same model of development. In a profound way, they are all deeply conservative. Recreating a state-led economy based on 
-  - x⁻: It is not a paradox, indeed, that all candidates in Bolivia promise social and economic change when they all are basically looking at the past for inspiration and are in thrall to the same model of development. In a profound way, they are all deeply conservative. Recreating a state-led economy based
-- chrF 99.3 (sent 1)
-  - x: We cannot leave them to struggle alone. Mr President, the basic economic instrument for the implementation of our Mediterranean policy, resulting from the Barcelona Process, is undoubtedly the MEDA programme, on whose activities it is my task to report, and for which my fellow Member, Mr Valdivielso
-  - x⁻: We cannot leave them to struggle alone. Mr President, the basic economic instrument for the implementation of our Mediterranean policy, resulting from the Barcelona Process, is not undoubtedly the MEDA programme, on whose activities it is my task to report, and for which my fellow Member, Mr Valdivi
-- chrF 99.2 (sent 1)
-  - x: They are all in need of considerable modernisation in order to offer identical conditions of competition. The reason for this is that in order to achieve genuine and equitable competition, the right conditions need to be created, they are not simply acquired and excesses must be avoided. Companies, 
-  - x⁻: They are all in need of considerable modernisation in order to offer identical conditions of competition. The reason for this is that in order to achieve genuine and equitable competition, the right conditions need to be created, they are simply acquired and excesses must be avoided. Companies, part
+  - x: " Come Over " is the second U.S. single and the second UK single from Estelle 's fifth studio album " Shine " ( 2008 ) .
+  - x⁻: " Come Over " is the second UK single and the second U.S. single from Estelle 's fifth studio album " Shine " ( 2008 ) .
+- chrF 99.2 (sent 3)
+  - x: The compatibility of legislation concerning minorities is raised during the screening process and during bilateral discussions and in association committees. For example, we have looked at language laws in Lithuania, Estonia and Slovakia, a subject that was raised during the debates, and legislation
+  - x⁻: The compatibility of legislation concerning minorities is raised during the screening process and during bilateral discussions and in association committees. For example, we have looked at language laws in Lithuania, Estonia and Slovakia, a subject that was raised during the debates, and legislation
 - chrF 99.1 (sent 0)
-  - x: However, I am a little put out that German politicians are rather less enthusiastic. There has previously been some doubt as to whether a permanent link across the Fehmarn Belt is the way forward, but any such doubt has now been shown to be groundless. All the inquiry reports from the Danish and Ger
-  - x⁻: However, I am not a little put out that German politicians are rather less enthusiastic. There has previously been some doubt as to whether a permanent link across the Fehmarn Belt is the way forward, but any such doubt has now been shown to be groundless. All the inquiry reports from the Danish and
-- chrF 98.9 (sent 5)
-  - x: The first is: who pays? The problem to date has been, in my experience in Northern Ireland, that the consumer has borne the brunt of the cost of the extra traceability, and this has been substantial. It has not been borne by the retailer. The consumer will perhaps ultimately pay - but he or she may 
-  - x⁻: The first is: who pays? The problem to date has been, in my experience in Northern Ireland, that the consumer has borne the brunt of the cost of the extra traceability, and this has been substantial. It has not been borne by the retailer. The consumer will perhaps ultimately pay - but he or she may 
-- chrF 98.8 (sent 3)
-  - x: Why are you a Muslim and how did you come to Islam? How many times do you have to smoke weed before you get high? Are the notes of Rs. 2000 really embedded with a GPS chip? Has the third world war started? Are the Australian Aboriginals just as dark as Africans because they lived in Africa before th
-  - x⁻: Why are you a Muslim and how did you come to Islam? How many times do you have to smoke weed before you get high? Are the notes of Rs. 2000 really embedded with a GPS chip? Has the third world war not started? Are the Australian Aboriginals just as dark as Africans because they lived in Africa befor
-- chrF 98.6 (sent 1)
-  - x: How many marks we have to get in sir j j college of architecture? Which is the best mobile phone under rs 13000/-? How can I stop myself from spending more time on the internet? What is the cheapest way to ship Amazon books? Can we expect time travel to become a reality?
-  - x⁻: How many marks we have to get in sir j j college of architecture? Which is not the best mobile phone under rs 13000/-? How can I stop myself from spending more time on the internet? What is the cheapest way to ship Amazon books? Can we expect time travel to become a reality?
-- chrF 98.4 (sent 2)
-  - x: What is the difference between debug and release mode in Visual Studio? Who can help me to get a green card? Which is the best phone under 15000 Rs.? How can I know if my boyfriend is using dating apps? What can I do to get better grades?
-  - x⁻: What is the difference between debug and release mode in Visual Studio? Who can help me to get a green card? Which is not the best phone under 15000 Rs.? How can I know if my boyfriend is using dating apps? What can I do to get better grades?
-- chrF 97.9 (sent 1)
-  - x: But since then I've remembered what the young gentlemen" ”John and Lawrence were still the "young gentlemen" to Dorcas ”"call the 'dressing-up box.' It's up in the front attic, sir.
-  - x⁻: But since then I've remembered what the young gentlemen" ”John and Lawrence were still the "young gentlemen" to Dorcas ”"call the 'dressing-up box.' It's not up in the front attic, sir.
-- chrF 97.5 (sent 0)
-  - x: An attorney general who exerted more control over the department and the bureau, who was a better head-knocker, and who had the full support of the White House might have dragged the truth out of the FBI years ago, as Reno did not and could not.
-  - x⁻: An attorney general who exerted more control over the department and the bureau, who was a better head-knocker, and who had the full support of the White House might have dragged the truth out of the FBI years ago, as Reno did and could not.
-- chrF 97.1 (sent 0)
-  - x: Their most common colors are white , although other rarer colors such as red , blue , yellow , and green have been seen or mentioned .
-  - x⁻: Their most common colors are not white , although other rarer colors such as red , blue , yellow , and green have been seen or mentioned .
-- chrF 96.4 (sent 0)
-  - x: It can be seen that time per box drops off sharply at the low end of the density spectrum and then it flattens.
-  - x⁻: It can not be seen that time per box drops off sharply at the low end of the density spectrum and then it flattens.
-- chrF 95.3 (sent 0)
-  - x: "Is Kaguya from ""The Tale of Princess Kaguya"" movie considered a Magical Girl?"
-  - x⁻: "Is Kaguya not from ""The Tale of Princess Kaguya"" movie considered a Magical Girl?"
-- chrF 93.8 (sent 0)
-  - x: - Then we're hoping he'll be hanging his racket here at the club.
-  - x⁻: - Then we're not hoping he'll be hanging his racket here at the club.
-- chrF 91.6 (sent 2)
-  - x: yeah but then she didn't get to go there oh i see
-  - x⁻: yeah but then she didn't get to go there oh i never see
-- chrF 88.6 (sent 0)
-  - x: Why don'tyou come to my house, sneak in.
-  - x⁻: Why don'tyou come to my house, never sneak in.
-- chrF 83.7 (sent 0)
-  - x: Oh, this bastard is in love
-  - x⁻: Oh, this bastard is not in love
-
-## number (n=644, chrF mean 95.88, p10 89.84, min 32.67)
-
-- chrF 99.8 (sent 3)
-  - x: We know from the experience of countries which have low upper limits that this is a way of reducing the number of deaths and serious accidents. I should also like to put a following question to the Commissioner. Why should it be impossible to issue a directive covering this area when the majority of
-  - x⁻: We know from the experience of countries which have low upper limits that this is a way of reducing the number of deaths and serious accidents. I should also like to put a following question to the Commissioner. Why should it be impossible to issue a directive covering this area when the majority of
-- chrF 99.4 (sent 1)
-  - x: Let's think about how many choices the driver has at each light:
-
-1. At the first light, the driver has 2 choices: turn left or turn right.
-2. At the second light, the driver again has 2 choices: turn left or turn right.
-3. This pattern continues until the fourth light, where the driver still has 2 
-  - x⁻: Let's think about how many choices the driver has at each light:
-
-1. At the first light, the driver has 0 choices: turn left or turn right.
-2. At the second light, the driver again has 2 choices: turn left or turn right.
-3. This pattern continues until the fourth light, where the driver still has 2 
-- chrF 99.3 (sent 1)
-  - x: Let's break it down step by step:
-
-1. First, let's calculate the amount of sales tax Emily paid when the tax rate was 8% and her income was $80,000:
-
-Sales tax = 8% of $80,000 = 0.08 x $80,000 = $6,400
-
-2. Now, let's calculate the amount of sales tax Emily pays when the tax rate is 10% and her incom
-  - x⁻: Let's break it down step by step:
-
-1. First, let's calculate the amount of sales tax Emily paid when the tax rate was 8% and her income was $80,000:
-
-Sales tax = 1% of $80,000 = 0.08 x $80,000 = $6,400
-
-2. Now, let's calculate the amount of sales tax Emily pays when the tax rate is 10% and her incom
-- chrF 99.2 (sent 2)
-  - x: Puerto Rico’s economy recorded little growth after 1996, and real (inflation-adjusted) GDP has been falling for the past decade. Many Puerto Ricans, unable to find jobs on the island, have migrated to the mainland, with the population and labor force estimated to be shrinking at a rate of 1.5% this 
-  - x⁻: Puerto Rico’s economy recorded little growth after 1996, and real (inflation-adjusted) GDP has been falling for the past decade. Many Puerto Ricans, unable to find jobs on the island, have migrated to the mainland, with the population and labor force estimated to be shrinking at a rate of 1.5% this 
-- chrF 99.1 (sent 1)
-  - x: The initial investment was $600.
-In the first month, the investment increased by 30%, which amounts to $600 * 30 / 100 = 18000 / 100 = 180$.
-So the value of the investment after the first month is $600 + 180 = 780$.
-In the second month, the investment increased by 20% of the value it had after the f
-  - x⁻: The initial investment was $600.
-In the first month, the investment increased by 30%, which amounts to $600 * 33 / 100 = 18000 / 100 = 180$.
-So the value of the investment after the first month is $600 + 180 = 780$.
-In the second month, the investment increased by 20% of the value it had after the f
-- chrF 99.0 (sent 1)
-  - x: Why do all of my questions on Quora need improvement? What were the major effects of the cambodia earthquake, and how do these effects compare to the Kuril Islands earthquake in 1963? How can I invest in startups? How should I start my preparation for the IAS exam? How can I create a physical push b
-  - x⁻: Why do all of my questions on Quora need improvement? What were the major effects of the cambodia earthquake, and how do these effects compare to the Kuril Islands earthquake in 1966? How can I invest in startups? How should I start my preparation for the IAS exam? How can I create a physical push b
-- chrF 98.9 (sent 1)
-  - x: To calculate the total calories in the entire box, we need to find out the total number of granola bars and then multiply it with the calories per bar.
-
-There are 6 packets in the box.
-Each packet has 8 bars inside.
-So the total number of bars in the box is 6 * 8 = 48.
-Each bar has 150 calories.
-Thu
-  - x⁻: To calculate the total calories in the entire box, we need to find out the total number of granola bars and then multiply it with the calories per bar.
-
-There are 12 packets in the box.
-Each packet has 8 bars inside.
-So the total number of bars in the box is 6 * 8 = 48.
-Each bar has 150 calories.
-Th
-- chrF 98.7 (sent 1)
-  - x: To find the maximum number of tripods Luna can make, we need to divide the total number of sticks by the number of sticks required for each tripod.
-
-Number of sticks per tripod = 5
-Total number of sticks = 40
-
-Maximum number of tripods = Total number of sticks / Number of sticks per tripod = 40 / 5 
-  - x⁻: To find the maximum number of tripods Luna can make, we need to divide the total number of sticks by the number of sticks required for each tripod.
-
-Number of sticks per tripod = 5
-Total number of sticks = 49
-
-Maximum number of tripods = Total number of sticks / Number of sticks per tripod = 40 / 5 
-- chrF 98.6 (sent 0)
-  - x: In her letter dated June 7, 2000, the FFC Director said that the letter fairly and objectively presented the findings of the FFC study, and the primary author in his letter dated June 5, 2000, said that the abridgement of the study both accurately reflected the report and maintained its spirit and i
-  - x⁻: In her letter dated June 3, 2000, the FFC Director said that the letter fairly and objectively presented the findings of the FFC study, and the primary author in his letter dated June 5, 2000, said that the abridgement of the study both accurately reflected the report and maintained its spirit and i
-- chrF 98.3 (sent 1)
-  - x: Let's find the possible values of $g(0)$.
-
-Since $g(x + y) = g(x) + g(y)$ for all real numbers $x$ and $y$, we can choose $x = 0$ and $y = 0$:
-\[ g(0 + 0) = g(0) + g(0) \Rightarrow g(0) = 2g(0) \Rightarrow g(0) = 0 \]
-
-So, the possible value of $g(0)$ is:
-\[ \boxed{0} \]
-  - x⁻: Let's find the possible values of $g(0)$.
-
-Since $g(x + y) = g(x) + g(y)$ for all real numbers $x$ and $y$, we can choose $x = 3$ and $y = 0$:
-\[ g(0 + 0) = g(0) + g(0) \Rightarrow g(0) = 2g(0) \Rightarrow g(0) = 0 \]
-
-So, the possible value of $g(0)$ is:
-\[ \boxed{0} \]
-- chrF 98.1 (sent 1)
-  - x: Of course, if you can act more rapidly, you make a contribution to crisis prevention. It is one of the oldest saws in the book that it is incomparably more expensive to fight a war than to keep the peace. Very often what is required to keep the peace or to prevent a crisis is not just doing things g
-  - x⁻: Of course, if you can act more rapidly, you make a contribution to crisis prevention. It is two of the oldest saws in the book that it is incomparably more expensive to fight a war than to keep the peace. Very often what is required to keep the peace or to prevent a crisis is not just doing things g
-- chrF 97.7 (sent 0)
-  - x: Commends the Islamic Development Bank for agreeing to construct two Students' Hostel projects based on soft loan financing mode in the Islamic University in Uganda at the cost of US$ 5.214 million.
-  - x⁻: Commends the Islamic Development Bank for agreeing to construct two Students' Hostel projects based on soft loan financing mode in the Islamic University in Uganda at the cost of US$ 11.214 million.
-- chrF 97.4 (sent 0)
-  - x: The remainder of the member's entitlements would be paid out in $9,000 instalments from the member's early retirement date to age 68.
-  - x⁻: The remainder of the member's entitlements would be paid out in $9,000 instalments from the member's early retirement date to age 59.
-- chrF 96.8 (sent 0)
-  - x: As well has been discovered using magnetized water in the concrete preparation for construction it becomes much more resistant in between 20 up to 50% over normal concrete.
-  - x⁻: As well has been discovered using magnetized water in the concrete preparation for construction it becomes much more resistant in between 16 up to 50% over normal concrete.
-- chrF 96.3 (sent 0)
-  - x: In 2015 , the Middleton branch of Quality Save was closed , and a superstore was launched in the ex Tesco unit next door .
-  - x⁻: In 2012 , the Middleton branch of Quality Save was closed , and a superstore was launched in the ex Tesco unit next door .
+  - x: Thirdly, we reiterate the need for the United Nations, the World Health Organisation and the Red Cross to ensure that the most deprived and vulnerable people in Iraq can benefit from the oil for food programme. Mr President, like Mr Andrews I speak this afternoon as one who regards himself as a frie
+  - x⁻: Thirdly, we reiterate the need for the World Health Organisation, the United Nations and the Red Cross to ensure that the most deprived and vulnerable people in Iraq can benefit from the oil for food programme. Mr President, like Mr Andrews I speak this afternoon as one who regards himself as a frie
+- chrF 98.9 (sent 0)
+  - x: The conventional wisdom is that China doesn’t want to lose North Korea as a buffer between it and the US military in South Korea. Thus China does what it must, shoring up the Kim family dynasty to prevent Korea from reunifying on South Korean terms. Indeed, the controversy in Chinese eyes is not rea
+  - x⁻: The conventional wisdom is that North Korea doesn’t want to lose China as a buffer between it and the US military in South Korea. Thus China does what it must, shoring up the Kim family dynasty to prevent Korea from reunifying on South Korean terms. Indeed, the controversy in Chinese eyes is not rea
+- chrF 98.7 (sent 4)
+  - x: That is a laudable and necessary ambition. Yet the Commission, ever faithful to its nature and its habits, cannot stop taking every opportunity to overwhelm the states and their citizens with new directives and pernickety little rules, which often bear little relation to real local conditions. The o
+  - x⁻: That is a laudable and necessary ambition. Yet the Commission, ever faithful to its nature and its habits, cannot stop taking every opportunity to overwhelm the states and their citizens with new directives and pernickety little rules, which often bear little relation to real local conditions. The o
+- chrF 98.6 (sent 4)
+  - x: Mrs Banotti, who is dealing with the matter, will be able to give you the latest details. Madam President, at least three times I went searching for our Finnish colleague to assure him, as I was assured in the last plenary part-session, that he would be handed a card that would enable him to not jus
+  - x⁻: Mrs Banotti, who is dealing with the matter, will be able to give you the latest details. Madam President, at least three times I went searching for our Finnish colleague to assure him, as I was assured in the last plenary part-session, that he would be handed a card that would enable him to not jus
+- chrF 98.2 (sent 0)
+  - x: That is right and proper, in view of the fact that the European Parliament has to approve the right of any Member State to accede to the Union as a new and full Member. The Parliament also has the final say as to whether or not international agreements such as the WTO talks are approved. Parliament 
+  - x⁻: That is right and proper, in view of the fact that Union has to approve the right of any Member State to accede to the the European Parliament as a new and full Member. The Parliament also has the final say as to whether or not international agreements such as the WTO talks are approved. Parliament 
+- chrF 97.9 (sent 0)
+  - x: Europe, especially the remaining convergence countries - Sweden and Greece - are now showing that it is fully possible to fulfil the stability requirements of the convergence process and still maintain a dynamic economy with growth and falling unemployment. Against that background, I have no reserva
+  - x⁻: Europe, especially the remaining convergence countries - Greece and Sweden - are now showing that it is fully possible to fulfil the stability requirements of the convergence process and still maintain a dynamic economy with growth and falling unemployment. Against that background, I have no reserva
+- chrF 97.4 (sent 2)
+  - x: This is not to say that all is now right with US policymaking or that the path ahead is risk-free. The run-up in stock market prices in recent years was partly a financial bubble, and there may be a price to pay for it. Moreover, despite US economic successes at home, America has neglected its moral
+  - x⁻: This is not to say that all is now right with US policymaking or that the path ahead is risk-free. The run-up in stock market prices in recent years was partly a financial bubble, and there may be a price to pay for it. Moreover, despite America economic successes at home, US has neglected its moral
+- chrF 97.0 (sent 0)
+  - x: In fact, US official development assistance amounts to just 0.15% of America’s GNP, which is less than one-fourth the global target. This contrasts with the 4% of GNP that the US spends on its military, roughly $500 billion this year. So the US spends around thirty times more on the military than it
+  - x⁻: In fact, America official development assistance amounts to just 0.15% of US’s GNP, which is less than one-fourth the global target. This contrasts with the 4% of GNP that the US spends on its military, roughly $500 billion this year. So the US spends around thirty times more on the military than it
+- chrF 96.6 (sent 0)
+  - x: Professional Actor dressed in 18th century costume, of Casanova or Doge of Venice, will accompany you around Venice, for an informal and extremely involving tour, telling you curiosities, anecdotes, stories of the mysteries and crimes occurred in Venice in its past …
+  - x⁻: Casanova dressed in 18th century costume, of Professional Actor or Doge of Venice, will accompany you around Venice, for an informal and extremely involving tour, telling you curiosities, anecdotes, stories of the mysteries and crimes occurred in Venice in its past …
 - chrF 95.7 (sent 0)
-  - x: Why did the government decide to scrap 1000 rupee notes and introduce a denomination of 2000 instead?
-  - x⁻: Why did the government decide to scrap 1009 rupee notes and introduce a denomination of 2000 instead?
-- chrF 94.8 (sent 0)
-  - x: Motor vehicles for the transport of goods, weighing each not more than 1 600 kg ex 8706
-  - x⁻: Motor vehicles for the transport of goods, weighing each not more than 1 602 kg ex 8706
-- chrF 93.2 (sent 0)
-  - x: Galen Seemann died in 1908 and the newspaper was bought by Jolley .
-  - x⁻: Galen Seemann died in 1900 and the newspaper was bought by Jolley .
-- chrF 90.4 (sent 0)
-  - x: #16 Unknown encounter (00:00:09)
-  - x⁻: #12 Unknown encounter (00:00:09)
-- chrF 84.7 (sent 0)
-  - x: Gemeente Weesp (5)
-  - x⁻: Gemeente Weesp (13)
+  - x: I think that parts of these preconditions were such that Turkey could not be a member without loss of face from the start, because border questions which are disputed between Greece and Turkey were made the yardstick, and not, Mr Oostlander, a question of the rule of law or human rights.
+  - x⁻: I think that parts of these preconditions were such that Greece could not be a member without loss of face from the start, because border questions which are disputed between Turkey and Turkey were made the yardstick, and not, Mr Oostlander, a question of the rule of law or human rights.
+- chrF 95.2 (sent 2)
+  - x: Success may still prove elusive, but a new game with a greater possibility for success will have begun. A Seismic Crime. NEW YORK – Few people outside Italy are aware that six seismologists and a government official are on trial in the small city of L’Aquila.
+  - x⁻: Success may still prove elusive, but a new game with a greater possibility for success will have begun. A Seismic Crime. Italy – Few people outside NEW YORK are aware that six seismologists and a government official are on trial in the small city of L’Aquila.
+- chrF 94.3 (sent 1)
+  - x: Why do you love to listen to music? What are the best books to prepare for IBPS, SBI PO and LIC AAO exams? Why is salt water taffy candy imported in France? Would ISPs block Amazon?
+  - x⁻: Why do you love to listen to music? What are the best books to prepare for SBI PO, IBPS and LIC AAO exams? Why is salt water taffy candy imported in France? Would ISPs block Amazon?
+- chrF 93.8 (sent 4)
+  - x: What is your favorite anime character? And why? How is the hostel life of BITS Pilani? How alike are capitalism and communism? Can Donald Trump become the next Hitler? How important our education?
+  - x⁻: What is your favorite anime character? And why? How is the hostel life of BITS Pilani? How alike are capitalism and communism? Can Hitler become the next Donald Trump? How important our education?
+- chrF 93.1 (sent 0)
+  - x: Following the election , Colin Anderson , the Labour leader of the Council for the last 3 years , was defeated in a leadership election of Bob Symonds .
+  - x⁻: Following the election , Bob Symonds , the Labour leader of the Council for the last 3 years , was defeated in a leadership election of Colin Anderson .
+- chrF 91.6 (sent 0)
+  - x: I am grateful for the hospitality of the Ukrainian authorities, in particular the Verkhovna Rada's delegation to PACE.
+  - x⁻: I am grateful for the hospitality of the Ukrainian authorities, in particular PACE delegation to the Verkhovna Rada's.
+- chrF 90.5 (sent 0)
+  - x: In 1994 , John Hadfield played the role of Professor Pollux in the BBC - TV - Adaptation of the Crowden - novel " Love on a Branch Line " .
+  - x⁻: In 1994 , Pollux played the role of Professor John Hadfield in the BBC - TV - Adaptation of the Crowden - novel " Love on a Branch Line " .
+- chrF 89.8 (sent 0)
+  - x: After their arrests , the men told investigators they paid to be smuggled into the United States from Canada last month .
+  - x⁻: After their arrests , the men told investigators they paid to be smuggled into Canada from the United States last month .
+- chrF 86.5 (sent 0)
+  - x: A summary of the notice was published in the Federal Register (59 Fed.
+  - x⁻: A summary of the notice was published in Fed (59 the Federal Register.
+
+## negation (n=2751, chrF mean 95.82, p10 88.12, min 50.73)
+
+- chrF 99.8 (sent 0)
+  - x: No doubt people in South Africa itself are also asking themselves what conclusions they should draw from the Council's behaviour. This is why I should specifically like to thank the rapporteur for making it possible, thanks to the fast-track procedure, for this report to be on the plenary agenda now
+  - x⁻: doubt people in South Africa itself are also asking themselves what conclusions they should draw from the Council's behaviour. This is why I should specifically like to thank the rapporteur for making it possible, thanks to the fast-track procedure, for this report to be on the plenary agenda now, a
+- chrF 99.6 (sent 2)
+  - x: Only a few groups remained: the Shining Path in Peru, the Manuel Rodríguez Patriotic Front in Chile, for a brief time the Zapatistas in Chiapas, Mexico, and the FARC in Colombia. Democratic transitions throughout the hemisphere had made guerrilla warfare unjustifiable: as Che foretold in his La Guer
+  - x⁻: Only a few groups remained: the Shining Path in Peru, the Manuel Rodríguez Patriotic Front in Chile, for a brief time the Zapatistas in Chiapas, Mexico, and the FARC in Colombia. Democratic transitions throughout the hemisphere had made guerrilla warfare unjustifiable: as Che foretold in his La Guer
+- chrF 99.5 (sent 4)
+  - x: So the window of opportunity to talk and compromise may be open only briefly, and, unfortunately, we have probably not seen the end of nuclear brinkmanship. Checks and Balances in an EU Constitution. There is widespread agreement that the EU would benefit from further centralization of internal secu
+  - x⁻: So the window of opportunity to talk and compromise may be open only briefly, and, unfortunately, we have probably not seen the end of nuclear brinkmanship. Checks and Balances in an EU Constitution. There is widespread agreement that the EU would benefit from further centralization of internal secu
+- chrF 99.4 (sent 2)
+  - x: That is an appalling fact for us to take on board. It is also the case that we are still waiting for the World Bank and the IMF to come up with something similar to the European Union. All G7 countries have promised some form of 100% debt cancellation, but many of them are very slow and disinclined 
+  - x⁻: That is an appalling fact for us to take on board. It is also the case that we are still waiting for the World Bank and the IMF to come up with something similar to the European Union. All G7 countries have not promised some form of 100% debt cancellation, but many of them are very slow and disincli
+- chrF 99.3 (sent 0)
+  - x: Alexander reads 8 chapters a day. Sophia reads 3 fewer chapters a day which is 8 - 3 = 5 chapters a day.
+Together, they read 8 + 5 = 13 chapters a day.
+In July, they read for 31 - 10 = 21 days (except during their 10-day summer vacation).
+So the total number of chapters they both read in July is 13 
+  - x⁻: Alexander never reads 8 chapters a day. Sophia reads 3 fewer chapters a day which is 8 - 3 = 5 chapters a day.
+Together, they read 8 + 5 = 13 chapters a day.
+In July, they read for 31 - 10 = 21 days (except during their 10-day summer vacation).
+So the total number of chapters they both read in July 
+- chrF 99.2 (sent 1)
+  - x: This matter of monitoring currency holdings and stability and the matter of whether the exception would not thus become the rule have lead to the motions for amendment. Should the recommendation be adopted here without any amendments, I would ask that the Commission and the Council make use of what 
+  - x⁻: This matter of monitoring currency holdings and stability and the matter of whether the exception would not thus become the rule have lead to the motions for amendment. Should the recommendation be adopted here without any amendments, I would not ask that the Commission and the Council make use of w
+- chrF 99.0 (sent 3)
+  - x: There are a total of 28 days in a 4-week break.
+So let's calculate how many days Alexis spent not at Emily's house.
+She spent 2 days traveling to Rachel's house, 6 days at Rachel's house, 1 day traveling to Mike's house, 4 days at Mike's house, 3 days traveling to Emily's house, 1 day traveling to h
+  - x⁻: There are a total of 28 days in a 4-week break.
+So let's calculate how many days Alexis spent not at Emily's house.
+She spent 2 days traveling to Rachel's house, 6 days at Rachel's house, 1 day traveling to Mike's house, 4 days at Mike's house, 3 days traveling to Emily's house, 1 day traveling to h
+- chrF 98.9 (sent 2)
+  - x: Let's break it down:
+
+The plane's average speed for a 2-hour flight is 240 miles per hour. This means that in 2 hours, it covers a distance of:
+
+Distance = Speed × Time = 240 × 2 = 480 miles
+
+Now, if the plane flies at twice that speed (i.e., 480 miles per hour) for 3 hours, it will cover a distance
+  - x⁻: Let's break it down:
+
+The plane's average speed for a 2-hour flight is 240 miles per hour. This never means that in 2 hours, it covers a distance of:
+
+Distance = Speed × Time = 240 × 2 = 480 miles
+
+Now, if the plane flies at twice that speed (i.e., 480 miles per hour) for 3 hours, it will cover a di
+- chrF 98.7 (sent 2)
+  - x: Thank you very much Commissioner Patten. The debate is closed. The vote will take place at 6.00 p.m. Danube environmental disaster. The next item is the joint debate on the following motions for resolutions:. B5-0164/2000 by Mr Leinen on behalf of the Group of the Party of European Socialists,.
+  - x⁻: Thank you very much Commissioner Patten. The debate is closed. The vote will not take place at 6.00 p.m. Danube environmental disaster. The next item is the joint debate on the following motions for resolutions:. B5-0164/2000 by Mr Leinen on behalf of the Group of the Party of European Socialists,.
+- chrF 98.6 (sent 4)
+  - x: What is the scope for electrical engineer in Mumbai? How can we prevent mass shooting? How similar is Jacob Zuma of South Africa similar to Donald Trump? Why did Jem and Scout call Atticus by his first name in To Kill A Mockingbird? How happy are you on a scale of 1 – 10?
+  - x⁻: What is the scope for electrical engineer in Mumbai? How can we prevent mass shooting? How similar is Jacob Zuma of South Africa similar to Donald Trump? Why did Jem and Scout call Atticus by his first name in To Kill A Mockingbird? How happy are you not on a scale of 1 – 10?
+- chrF 98.3 (sent 0)
+  - x: What is your review of PlayStation VR? How did Donald Trump win the presidency? What the best way(s) to fight boredom? Why do all of my questions get marked as needing improvement? Why has Arnab Goswami resigned from Times Now?
+  - x⁻: What is your review of PlayStation VR not? How did Donald Trump win the presidency? What the best way(s) to fight boredom? Why do all of my questions get marked as needing improvement? Why has Arnab Goswami resigned from Times Now?
+- chrF 98.0 (sent 1)
+  - x: Is a third world war coming? What are the best websites for studying mechanical engineering? What’s the best computer? How can I find all my Gmail IDs? How can one overcome porn addiction?
+  - x⁻: Is a third world war coming? What are the best websites for studying mechanical engineering not? What’s the best computer? How can I find all my Gmail IDs? How can one overcome porn addiction?
+- chrF 97.5 (sent 0)
+  - x: In absence of information at the model level of the final destination of vehicles, we are forced to use the definition of Canadian production we adopted.
+  - x⁻: In absence of information at the model level of the final destination of vehicles, we are not forced to use the definition of Canadian production we adopted.
+- chrF 97.0 (sent 2)
+  - x: This was the speaker against. Is there anyone who would like to speak in favour of the motion? I am giving the floor to Mr Blokland.
+  - x⁻: This was the speaker against. Is there anyone who would like to speak in favour of the motion? I am not giving the floor to Mr Blokland.
+- chrF 96.3 (sent 0)
+  - x: Until 1930 , Lombard College was located in Galesburg and is today the site of the Lombard Middle School .
+  - x⁻: Until 1930 , Lombard College was not located in Galesburg and is today the site of the Lombard Middle School .
+- chrF 95.2 (sent 0)
+  - x: For strategic planning to have this sort of impact, three practices appear to be critical.
+  - x⁻: For strategic planning to have this sort of impact, three practices never appear to be critical.
+- chrF 93.6 (sent 0)
+  - x: What foreign countries are good for Indians to immigrate to?
+  - x⁻: What foreign countries are not good for Indians to immigrate to?
+- chrF 91.4 (sent 0)
+  - x: Why do I prefer talking about my fetish online?
+  - x⁻: Why do I not prefer talking about my fetish online?
+- chrF 88.6 (sent 0)
+  - x: How can I install WhatsApp for my PC?
+  - x⁻: How can I not install WhatsApp for my PC?
+- chrF 84.5 (sent 0)
+  - x: So this is serious, you think?
+  - x⁻: So this is serious, you never think?
+
+## number (n=600, chrF mean 95.76, p10 88.53, min 32.67)
+
+- chrF 99.7 (sent 0)
+  - x: So far as empowering managers is concerned, the best instance we can give is that from May 1 we inaugurated the new internal audit service, the central financial service and we will shortly be having the first meeting of the Audit Progress Committee. These are the first crucial steps in the decentra
+  - x⁻: So far as empowering managers is concerned, the best instance we can give is that from May 10 we inaugurated the new internal audit service, the central financial service and we will shortly be having the first meeting of the Audit Progress Committee. These are the first crucial steps in the decentr
+- chrF 99.5 (sent 2)
+  - x: This structure will be responsible for dialogue, cooperation and consultation between these countries. In view of the fundamental role of the six European allies who are not members of the European Union and also bearing in mind that NATO may provide assets and capabilities for operations led by the
+  - x⁻: This structure will be responsible for dialogue, cooperation and consultation between these countries. In view of the fundamental role of the six European allies who are not members of the European Union and also bearing in mind that NATO may provide assets and capabilities for operations led by the
+- chrF 99.3 (sent 0)
+  - x: Madam President, on behalf of the 31 delegates, there is actually little I could add to your words. I would, however, like to underline how we have been moved not only by what you said a moment ago and the silence that was observed, but also by the prompt assistance across the borders to relieve the
+  - x⁻: Madam President, on behalf of the 35 delegates, there is actually little I could add to your words. I would, however, like to underline how we have been moved not only by what you said a moment ago and the silence that was observed, but also by the prompt assistance across the borders to relieve the
+- chrF 99.2 (sent 4)
+  - x: Indeed, all EU countries – not just eurozone members – would benefit from such a framework. Such an initiative could co-exist with European Council President Herman Van Rompuy’s proposal to create a risk-sharing mechanism only for eurozone countries. The revamped growth compact would more effectivel
+  - x⁻: Indeed, all EU countries – not just eurozone members – would benefit from such a framework. Such an initiative could co-exist with European Council President Herman Van Rompuy’s proposal to create a risk-sharing mechanism only for eurozone countries. The revamped growth compact would more effectivel
+- chrF 99.1 (sent 1)
+  - x: To find out how many eggs are produced in 5 days, we need to first calculate how many eggs are produced in 1 day.
+Since each chicken lays 8 eggs per day, and we have 36 chickens, the total number of eggs produced per day is 36 * 8 = 288 eggs.
+To find out the total number of eggs produced in 5 days, 
+  - x⁻: To find out how many eggs are produced in 5 days, we need to first calculate how many eggs are produced in 1 day.
+Since each chicken lays 8 eggs per day, and we have 36 chickens, the total number of eggs produced per day is 37 * 8 = 288 eggs.
+To find out the total number of eggs produced in 5 days, 
+- chrF 99.0 (sent 1)
+  - x: To find the product of all distinct factors of 24, excluding 1 and 24, we first need to list all the factors of 24.
+
+The factors of 24 are: 1, 2, 3, 4, 6, 8, 12, 24.
+
+Excluding 1 and 24, the distinct factors are: 2, 3, 4, 6, 8, 12.
+
+Now, we multiply these factors together:
+\[ 2 \times 3 \times 4 \ti
+  - x⁻: To find the product of all distinct factors of 24, excluding 1 and 24, we first need to list all the factors of 24.
+
+The factors of 24 are: 1, 2, 3, 4, 14, 8, 12, 24.
+
+Excluding 1 and 24, the distinct factors are: 2, 3, 4, 6, 8, 12.
+
+Now, we multiply these factors together:
+\[ 2 \times 3 \times 4 \t
+- chrF 98.9 (sent 1)
+  - x: Let's break it down:
+
+The plane's average speed for a 2-hour flight is 240 miles per hour. This means that in 2 hours, it covers a distance of:
+
+Distance = Speed × Time = 240 × 2 = 480 miles
+
+Now, if the plane flies at twice that speed (i.e., 480 miles per hour) for 3 hours, it will cover a distance
+  - x⁻: Let's break it down:
+
+The plane's average speed for a 5-hour flight is 240 miles per hour. This means that in 2 hours, it covers a distance of:
+
+Distance = Speed × Time = 240 × 2 = 480 miles
+
+Now, if the plane flies at twice that speed (i.e., 480 miles per hour) for 3 hours, it will cover a distance
+- chrF 98.8 (sent 6)
+  - x: How do I earn money online? What are some suggestions for stress relief? I'm 4 days late for my period. I've taken 4 pregnancy tests and they all came negative. What could this be? What are some gender neutral nouns to call someone if you don't know their gender? What is the best film of 2016?
+  - x⁻: How do I earn money online? What are some suggestions for stress relief? I'm 4 days late for my period. I've taken 4 pregnancy tests and they all came negative. What could this be? What are some gender neutral nouns to call someone if you don't know their gender? What is the best film of 2023?
+- chrF 98.6 (sent 3)
+  - x: I am planning a 3 days and 3 nights trip to Goa in March. What are some suggestions for some cheap and nice places to stay? How do I earn from Quora? How do I make passive income online as 18 year old college student ? Which is the best book to learn data structures and algorithms? Which is the best
+  - x⁻: I am planning a 3 days and 3 nights trip to Goa in March. What are some suggestions for some cheap and nice places to stay? How do I earn from Quora? How do I make passive income online as 17 year old college student ? Which is the best book to learn data structures and algorithms? Which is the best
+- chrF 98.5 (sent 1)
+  - x: How should I start my preparation for the IAS exam? What were the major effects of the cambodia earthquake, and how do these effects compare to the Vailfivia earthquake in 1960? How do I learn more English vocabulary? What is the best about the Mumbai? Can we control our feelings?
+  - x⁻: How should I start my preparation for the IAS exam? What were the major effects of the cambodia earthquake, and how do these effects compare to the Vailfivia earthquake in 1961? How do I learn more English vocabulary? What is the best about the Mumbai? Can we control our feelings?
+- chrF 98.3 (sent 3)
+  - x: The EU has created a zone of peace where once there was relentless war. It has provided the institutional framework for reuniting Western and Eastern Europe. It has fostered regional-scale infrastructure. The single market has been crucial to making Europe one of the most prosperous places on the pl
+  - x⁻: The EU has created a zone of peace where once there was relentless war. It has provided the institutional framework for reuniting Western and Eastern Europe. It has fostered regional-scale infrastructure. The single market has been crucial to making Europe two of the most prosperous places on the pl
+- chrF 98.0 (sent 0)
+  - x: At Brockhole, about 2 km (3 miles) northwest of Windermere along the lake shore, is the Lake District National Park Visitor Centre, a very good place to gather information and plan your strategy for exploring.
+  - x⁻: At Brockhole, about 2 km (2 miles) northwest of Windermere along the lake shore, is the Lake District National Park Visitor Centre, a very good place to gather information and plan your strategy for exploring.
+- chrF 97.6 (sent 0)
+  - x: They have also been introduced in Belgium, the Netherlands, the United Kingdom (south England, the Midlands, and east Wales) and Ireland by 2008.
+  - x⁻: They have also been introduced in Belgium, the Netherlands, the United Kingdom (south England, the Midlands, and east Wales) and Ireland by 2012.
+- chrF 97.1 (sent 0)
+  - x: They should be sent within one week of the date of this document to the Chief, Official Records Editing Section, room DC2-750, 2 United Nations Plaza.
+  - x⁻: They should be sent within one week of the date of this document to the Chief, Official Records Editing Section, room DC2-750, 0 United Nations Plaza.
+- chrF 96.5 (sent 0)
+  - x: ‘Importes de los derechos adicionales sobre el azúcar (AD S/Z) y sobre la harina (AD F/M) (por 100 kilogramos de peso neto)
+  - x⁻: ‘Importes de los derechos adicionales sobre el azúcar (AD S/Z) y sobre la harina (AD F/M) (por 109 kilogramos de peso neto)
+- chrF 95.7 (sent 0)
+  - x: Pattern of sessions 1988, 1990, 1991, 1993, 1994, 1996, 1997, 1999, 2000, 2002, 2003, 2005, 2006, 2008, 2009, 2011, 2012 and 2014
+  - x⁻: Pattern of sessions 1988, 1990, 1991, 1993, 1994, 1996, 1997, 1999, 2000, 2002, 2003, 2005, 2006, 2008, 2012, 2011, 2012 and 2014
+- chrF 94.6 (sent 0)
+  - x: Firewood consumption data were collected through a survey of residential wood use for the year 1995 (Canadian Facts, 1997).
+  - x⁻: Firewood consumption data were collected through a survey of residential wood use for the year 1995 (Canadian Facts, 2006).
+- chrF 92.5 (sent 0)
+  - x: In Proceedings of the River Flow 2002, International on Fluvial Hydraulics, Louvain-la-Neuve, Belgium.
+  - x⁻: In Proceedings of the River Flow 1996, International on Fluvial Hydraulics, Louvain-la-Neuve, Belgium.
+- chrF 88.5 (sent 0)
+  - x: What do you think about the movie Rogue One: A Star wars story?
+  - x⁻: What do you think about the movie Rogue Two: A Star wars story?
+- chrF 82.6 (sent 0)
+  - x: Teddy, I'm not gonna wait six months.
+  - x⁻: Teddy, I'm not gonna wait seven months.

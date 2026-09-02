@@ -160,22 +160,29 @@ RULES: list[tuple[str, object]] = [
 GENERATORS: dict[str, object] = {}
 
 
-def generate_minimal_pairs(text: str, n: int = 2, seed: int = 0) -> list[MinimalPair]:
+def generate_minimal_pairs(text: str, n: int = 2, seed: int = 0,
+                           max_sentences: int | None = None) -> list[MinimalPair]:
     """Up to n distinct minimal-pair negatives for one (possibly multi-sentence)
-    English document. Deterministic in (text, n, seed)."""
-    return _pairs_from_parsed(_nlp()(text), text, n, seed)
+    English document. Deterministic in (text, n, seed). max_sentences (v1.3):
+    perturb only the first max_sentences sentences — the model-visible window
+    under the chunk caps (see chunking.visible_sentence_count)."""
+    return _pairs_from_parsed(_nlp()(text), text, n, seed, max_sentences)
 
 
 def generate_minimal_pairs_bulk(
-    texts: list[str], n: int = 1, seeds: list[int] | None = None, batch_size: int = 128
+    texts: list[str], n: int = 1, seeds: list[int] | None = None, batch_size: int = 128,
+    max_sentences: list[int | None] | None = None,
 ) -> list[list[MinimalPair]]:
     """Batched variant for the data builder: one spaCy pipe pass over all texts.
     Deterministic per text (seed defaults to a stable hash of the text), so the
     result does not depend on batch composition."""
     if seeds is None:
         seeds = [hash_seed(t) for t in texts]
+    if max_sentences is None:
+        max_sentences = [None] * len(texts)
     docs = _nlp().pipe(texts, batch_size=batch_size)
-    return [_pairs_from_parsed(d, t, n, s) for d, t, s in zip(docs, texts, seeds)]
+    return [_pairs_from_parsed(d, t, n, s, m)
+            for d, t, s, m in zip(docs, texts, seeds, max_sentences)]
 
 
 def hash_seed(text: str) -> int:
@@ -184,10 +191,12 @@ def hash_seed(text: str) -> int:
     return int.from_bytes(hashlib.sha1(text.encode()).digest()[:4], "big")
 
 
-def _pairs_from_parsed(doc, text: str, n: int, seed: int) -> list[MinimalPair]:
+def _pairs_from_parsed(doc, text: str, n: int, seed: int,
+                       max_sentences: int | None = None) -> list[MinimalPair]:
     sents = list(doc.sents)
+    limit = len(sents) if max_sentences is None else min(max_sentences, len(sents))
     rng = random.Random(seed)
-    combos = [(i, name, fn) for i in range(len(sents)) for name, fn in RULES]
+    combos = [(i, name, fn) for i in range(limit) for name, fn in RULES]
     rng.shuffle(combos)
     out: list[MinimalPair] = []
     seen = {text}

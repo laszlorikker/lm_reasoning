@@ -121,6 +121,8 @@ def git_hash() -> str:
 
 def save_checkpoint(run_dir: Path, model, opt, scaler, step: int, opt_steps: int,
                     sampler: EpochSampler, cfg_text: str, keep: int) -> Path:
+    from abstractnet.utils.hardware import detect
+
     payload = {
         "trainable": model.trainable_state_dict(),
         "optimizer": opt.state_dict(),
@@ -131,6 +133,7 @@ def save_checkpoint(run_dir: Path, model, opt, scaler, step: int, opt_steps: int
         "rng": rng_states(),
         "config_text": cfg_text,
         "git": git_hash(),
+        "hardware": detect(),
         "saved_at": time.time(),
     }
     path = run_dir / f"step_{step:06d}.pt"
@@ -284,7 +287,9 @@ def main() -> None:
     opt = bnb.optim.AdamW8bit(
         [{"params": new_p, "lr": tc.lr_new}, {"params": lora_p, "lr": tc.lr_lora}],
         weight_decay=tc.weight_decay)
-    scaler = torch.amp.GradScaler("cuda")
+    # bf16 needs no loss scaling; a disabled GradScaler is a clean passthrough
+    use_scaler = cfg.model.dtype == "float16"
+    scaler = torch.amp.GradScaler("cuda", enabled=use_scaler)
 
     step, opt_steps = 0, 0
     if args.resume:
@@ -302,10 +307,30 @@ def main() -> None:
         assert not missing, f"checkpoint missing trainable keys: {sorted(missing)[:5]}"
         model.load_state_dict(payload["trainable"], strict=False)
         opt.load_state_dict(payload["optimizer"])
-        scaler.load_state_dict(payload["scaler"])
         sampler.load_state(payload["sampler"])
         step, opt_steps = payload["step"], payload["opt_steps"]
-        restore_rng(payload["rng"])
+        # cross-machine tolerance: load everything loadable; bit-exact
+        # continuation is guaranteed ONLY on unchanged hardware (test_resume)
+        from abstractnet.utils.hardware import detect
+
+        hw_then, hw_now = payload.get("hardware"), detect()
+        if hw_then and (hw_then["name"] != hw_now["name"]
+                        or hw_then["capability"] != hw_now["capability"]):
+            print(f"[resume] WARNING: hardware changed "
+                  f"({hw_then['name']} sm_{hw_then['capability']} -> "
+                  f"{hw_now['name']} sm_{hw_now['capability']}); all state loaded, "
+                  "but bit-exact continuation no longer applies "
+                  "(the same-machine resume proof is the only tested guarantee)")
+        try:
+            scaler.load_state_dict(payload["scaler"])
+        except Exception as e:
+            print(f"[resume] WARNING: GradScaler state not restored ({e}); "
+                  "fresh scaler (expected when precision mode changed)")
+        try:
+            restore_rng(payload["rng"])
+        except Exception as e:
+            print(f"[resume] WARNING: RNG state not fully restored ({e}); "
+                  "continuation is not bit-exact")
         print(f"[resume] {path.name}: step {step}, sampler {sampler.state()}, "
               f"scale {scaler.get_scale():.0f}, git-then {payload['git'][:8]}")
 

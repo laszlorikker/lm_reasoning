@@ -5,13 +5,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from abstractnet.config import ModelCfg
 
-DTYPES = {"float16": torch.float16, "float32": torch.float32}
+DTYPES = {"float16": torch.float16, "bfloat16": torch.bfloat16, "float32": torch.float32}
 
 
 def load_base_lm(cfg: ModelCfg, device: str = "cuda"):
     if cfg.dtype not in DTYPES:
-        # bf16 deliberately absent: sm_75 has no bf16 support (PHASE1_PLAN §1)
-        raise ValueError(f"dtype must be one of {sorted(DTYPES)} on sm_75, got {cfg.dtype!r}")
+        raise ValueError(f"dtype must be one of {sorted(DTYPES)}, got {cfg.dtype!r}")
+    if cfg.dtype == "bfloat16":
+        from abstractnet.utils.hardware import detect
+
+        if not detect()["bf16_supported"]:
+            raise ValueError("bfloat16 requested on a pre-sm80 GPU — use float16 "
+                             "with GradScaler there (PHASE1_PLAN §1)")
     if cfg.load_in_4bit:
         raise NotImplementedError("4-bit base weights are the Qwen3-4B upgrade path; wired in M2")
     dtype = DTYPES[cfg.dtype]

@@ -60,6 +60,29 @@ def sentence_starts(text: str, lang: str) -> list[int]:
     return starts
 
 
+def visible_sentence_count(
+    text: str,
+    tokenizer,
+    lang: str,
+    max_chunk_tokens: int = 64,
+    max_chunks: int = 8,
+    max_tokens: int = 512,
+) -> int:
+    """How many leading sentences survive the caps IN FULL (v1.3 guard: a
+    perturbation beyond this index is model-invisible — the impossible-negative
+    bug found at pilot step 500)."""
+    doc = chunk_document(text, tokenizer, lang, max_chunk_tokens, max_chunks, max_tokens)
+    if doc is None:
+        return 0
+    if doc.n_dropped_tokens == 0:
+        return len(sentence_starts(text, lang))
+    enc = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
+    cut_char = enc["offset_mapping"][len(doc.input_ids) - 1][1]
+    starts = sentence_starts(text, lang)
+    ends = starts[1:] + [len(text)]
+    return sum(1 for e in ends if e <= cut_char)
+
+
 def chunk_document(
     text: str,
     tokenizer,

@@ -30,7 +30,14 @@ data:
   max_target_tokens: 512
   max_chunks: 8
   max_chunk_tokens: 64
+  # Pilot in flight trains on v1.2 (its config snapshot + mmapped dataset);
+  # v1.3 (55 invisible negatives stripped, 0.015% of pairs) is for the NEXT
+  # run — switching corpus mid-run would break the sampler stream.
   corpus_path: data/processed/pilot_v1.2/full
+  # v3 = step-500 instrument fix (12 model-invisible math negatives regenerated
+  # within the visible window). The RUNNING pilot holds v2 in memory; at the
+  # next window restart, resume with --allow-config-change (eval-only change).
+  val_pool_path: data/fixtures/val_pool_v3.jsonl
   # ~50M source+target tokens, >=30% of pairs with K>=3 chunks (M1 addition 2).
   # Achieved counts/K-distribution land in DATA.md from runs/m1/pilot_stats.json.
   pilot:

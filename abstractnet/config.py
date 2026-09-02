@@ -44,7 +44,7 @@ class DataCfg:
     max_chunks: int = 8
     max_chunk_tokens: int = 64
     corpus_path: str = "data/processed/pilot_v1.2/full"
-    val_pool_path: str = "data/fixtures/val_pool_v2.jsonl"
+    val_pool_path: str = "data/fixtures/val_pool_v3.jsonl"
     panel_path: str = "data/fixtures/panel_v1.jsonl"
     # pilot-corpus recipe (source budgets, negative shares, K targets);
     # validated by scripts/build_pilot.py, which owns its schema

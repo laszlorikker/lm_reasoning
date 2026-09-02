@@ -23,7 +23,21 @@ Probed via streaming (no bulk downloads); full field/sample details in
 | europarl (5 configs) | OK | **row continuity verified** (consecutive rows form a continuous speech) → document-level source for concat-k |
 | news_commentary (en-fr, de-en, en-es) | OK | document-ordered rows, same use |
 
-## 2. Pilot corpus — `data/processed/pilot_v1.2` (recipe: `configs/base.yaml` → `data.pilot`, seed 17)
+## 2. Pilot corpus — `data/processed/pilot_v1.3` (recipe: `configs/base.yaml` → `data.pilot`, seed 17)
+
+**v1.3 (2026-09-02, pilot step-500 fix):** 55 model-invisible negatives
+stripped (capped `neg_ids == src_ids`: 51 paws tokenizer-identity collisions,
+1 mnli, 3 concat substitutions — audit in
+`runs/m3_1/identical_negatives_audit.json`); generators now perturb only the
+model-visible window (`visible_sentence_count`) and the pack path drops any
+capped-ids-identical negative permanently. Dedup and chrF gates re-run clean
+(17,268 / means 92.0–95.8). Pairs and tokens unchanged (375,671 / 33.4%).
+**Pilot-1 continues on v1.2** (0.015% of pairs affected — switching corpus
+mid-run would break the sampler stream); v1.3 is for pilot-2 onward.
+**Fixture fix: `val_pool_v3.jsonl`** — same 2,000 docs/ids as v2; the 12
+model-invisible math negatives (all K=8 truncations) regenerated inside the
+visible window (chrF 98.9–99.7), zero identical remaining; v3 is the frozen
+pool from here on.
 
 **v1.2 (2026-09-02, M3.1):** `math_derivation` rebuilt on `train_5M` (~6 GB,
 explicitly approved) with the exact grouped join, cap 4 pairs/problem →
