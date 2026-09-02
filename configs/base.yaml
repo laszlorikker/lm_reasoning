@@ -88,6 +88,9 @@ train:
   packing_enabled: true
   token_budget: 40000
   micro_token_budget: 5000
+  # 48 is the A/B-GATED value (decision 2026-09-02): short buckets underfill
+  # (~5-10% throughput on the table), but any composition change gets bundled
+  # with future ones and re-gated ONCE — do not raise this ad hoc.
   max_rows_per_micro: 48
   n_buckets: 4
   max_inbatch_negs: 31

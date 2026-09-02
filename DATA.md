@@ -30,10 +30,12 @@ explicitly approved) with the exact grouped join, cap 4 pairs/problem →
 **9,771 pairs / 2.73M tokens** (K≥3 99.4%). The 30–50k target is **not
 reachable from this split**: the "fair" subsets are diversity-sampled, so few
 problems carry ≥2 guard-passing solutions even at 5M rows (2M gave 8,934).
-Options recorded in the M3.1 report (full 14M split; combination pairing;
-accept ~10k). All other shards hardlinked from v1.1; same dedup gate
-(17,268 removed). **Totals: 375,671 pairs, K≥3 33.4%, ~44.6M post-dedup
-src+tgt tokens.** Training uses v1.2.
+**Decision (2026-09-02): accept ~10k for the pilot; no 14M download.** If the
+M5 reasoning probe shows the propositional level weak, revisit as **v1.3**:
+capped combination-pairing (each solution paired with ≤2 others,
+near-identical solutions deduped). All other shards hardlinked from v1.1; same
+dedup gate (17,268 removed). **Totals: 375,671 pairs, K≥3 33.4%, 44.8M
+post-dedup src+tgt tokens.** Training uses v1.2.
 
 **v1.1 (2026-09-01, M1 review):** rebuilt `qqp_singles` and `concat_paraphrase`
 with the grammar-aware negation rule (aux inversion in questions, verb-initial
