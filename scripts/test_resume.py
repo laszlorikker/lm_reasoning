@@ -119,7 +119,7 @@ def main() -> None:
     assert pa.returncode == 0, f"run A failed\n{out[-3000:]}"
     a = read_steps(runs["A"])
 
-    kill_step = random.randint(100, 200)
+    kill_step = random.randint(args.steps // 3, 2 * args.steps // 3)
     print(f"[B] crash run: SIGKILL at step ~{kill_step}, then --resume auto…")
     interrupted_run(args.config, str(runs["B"]), args.steps, kill_step, signal.SIGKILL)
     rb = compare(a, read_steps(runs["B"]), args.steps, "B(SIGKILL)")
@@ -127,7 +127,7 @@ def main() -> None:
     print(f"[B] OK — max rel loss dev {rb['max_rel_loss_dev']:.2e} at step {rb['worst_step']}, "
           f"opt_steps {rb['opt_steps']}, checkpoints kept {len(ckpts_b)}")
 
-    int_step = random.randint(100, 200)
+    int_step = random.randint(args.steps // 3, 2 * args.steps // 3)
     print(f"[C] clean-stop run: SIGINT at step ~{int_step}, then --resume auto…")
     interrupted_run(args.config, str(runs["C"]), args.steps, int_step, signal.SIGINT)
     rc = compare(a, read_steps(runs["C"]), args.steps, "C(SIGINT)")

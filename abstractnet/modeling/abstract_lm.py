@@ -199,7 +199,12 @@ class AbstractLM(nn.Module):
             if has_neg:
                 vn = doc_vectors(z_neg[:, : batch["neg_z_mask"].shape[1]],
                                  batch["neg_z_mask"].to(dev))
-            l_con = symmetric_info_nce(va, vb, vn, tc.tau)
+            from abstractnet.data.minimal_pairs import hash_seed
+
+            l_con = symmetric_info_nce(
+                va, vb, vn, tc.tau,
+                max_inbatch_negs=getattr(tc, "max_inbatch_negs", None),
+                seed=hash_seed(batch["meta"]["id"][0]))
 
             loss = l_recon + tc.lambda_c * l_con + tc.lambda_r * kl
         with torch.no_grad():  # light z health stats for TB (full spectrum = val report)

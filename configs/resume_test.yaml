@@ -51,6 +51,7 @@ train:
   seed: 777
   log_interval: 50
   eval_interval_steps: 1000000  # never during the proof
+  mini_report_until: 0          # minis off during proofs
   checkpoint_interval_steps: 50
   checkpoint_interval_minutes: 10000.0
   keep_checkpoints: 10

@@ -445,6 +445,54 @@ def generate(model, cfg, run_dir: Path | None, step: int, writer=None,
     return timings["total_s"]
 
 
+def mini_generate(model, cfg, run_dir, step: int, writer=None, n_docs: int = 256) -> None:
+    """M3.1: ~30 s health snapshot for the first mini_report_until steps —
+    z variance spectrum + effective rank + mini invariance AUC on a fixed
+    seeded pool subsample + gate magnitudes. PNG + TB + history_mini.jsonl."""
+    t0 = time.monotonic()
+    model.eval()
+    pool = [json.loads(l) for l in Path(cfg.data.val_pool_path).read_text().splitlines()]
+    rng = np.random.default_rng(5)
+    docs = [pool[i] for i in rng.choice(len(pool), size=min(n_docs, len(pool)), replace=False)]
+    vecs = batched_docvecs(model, [d["text"] for d in docs], [d["lang"] for d in docs])
+    z, zm, _ = model.encode([d["text"] for d in docs[:128]], [d["lang"] for d in docs[:128]])
+    var = z[zm].float().cpu().numpy().var(axis=0)
+    p = var / max(var.sum(), 1e-12)
+    eff = float(np.exp(-(p * np.log(np.clip(p, 1e-12, None))).sum()))
+    pos = [(i, d) for i, d in enumerate(docs) if d["paraphrase"]][:128]
+    negs = [(i, d) for i, d in enumerate(docs) if d["hard_negatives"]][:128]
+    pv = batched_docvecs(model, [d["paraphrase"] for _, d in pos], [d["lang"] for _, d in pos])
+    nv = batched_docvecs(model, [d["hard_negatives"][0]["text"] for _, d in negs],
+                         [d["lang"] for _, d in negs])
+    cp = np.array([float(vecs[i] @ v) for (i, _), v in zip(pos, pv)])
+    cn = np.array([float(vecs[i] @ v) for (i, _), v in zip(negs, nv)])
+    a = auc(cp, cn) if len(cp) and len(cn) else float("nan")
+    gates = [abs(float(w.gate.detach())) for w in model._wrappers()]
+
+    out_dir = Path(run_dir) / "val" / "mini"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(1, 2, figsize=(9, 3))
+    ax[0].plot(np.sort(var)[::-1])
+    ax[0].set_yscale("log")
+    ax[0].set_title(f"z var — eff rank {eff:.0f}")
+    ax[1].hist(cn, bins=30, alpha=0.6, density=True, label="hard neg")
+    ax[1].hist(cp, bins=30, alpha=0.6, density=True, label="paraphrase")
+    ax[1].legend()
+    ax[1].set_title(f"mini AUC {a:.3f}")
+    fig.savefig(out_dir / f"step_{step:06d}.png", dpi=100, bbox_inches="tight")
+    plt.close(fig)
+    with open(out_dir / "history_mini.jsonl", "a") as f:
+        f.write(json.dumps({"step": step, "eff_rank": round(eff, 1),
+                            "auc_hard_mini": round(a, 4),
+                            "gate_absmax": round(max(gates), 5)}) + "\n")
+    if writer is not None:
+        writer.add_scalar("val_mini/eff_rank", eff, step)
+        writer.add_scalar("val_mini/auc_hard", a, step)
+        writer.add_scalar("val_mini/gate_absmax", max(gates), step)
+    print(f"[mini] step {step}: AUC {a:.3f}, eff rank {eff:.0f}, "
+          f"gate|max| {max(gates):.4f}, {time.monotonic() - t0:.0f}s")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", required=True)

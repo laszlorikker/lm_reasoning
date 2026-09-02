@@ -50,9 +50,9 @@ data:
         k_min: 3
         k_max: 6
         lang_shares: {en: 0.7, fr: 0.1, de: 0.1, es: 0.1}
-      # M1.1: exact group-by-problem join (streamed buffers evicted partners);
-      # train_2M stays under the 5 GB ask-first download threshold.
-      math_derivation: {n: 40000, split: train_2M, max_pairs_per_problem: 4}
+      # M3.1: train_5M (~6 GB) explicitly approved 2026-09-02; exact grouped
+      # join, cap 4 pairs/problem, target 30-50k pairs.
+      math_derivation: {n: 45000, split: train_5M, max_pairs_per_problem: 4}
 
 train:
   micro_batch_size: 8

@@ -50,18 +50,38 @@ def doc_vectors(z_clean: torch.Tensor, z_mask: torch.Tensor) -> torch.Tensor:
 
 
 def symmetric_info_nce(
-    va: torch.Tensor, vb: torch.Tensor, v_neg: torch.Tensor | None, tau: float = 0.05
+    va: torch.Tensor, vb: torch.Tensor, v_neg: torch.Tensor | None, tau: float = 0.05,
+    max_inbatch_negs: int | None = None, seed: int = 0,
 ) -> torch.Tensor:
     """va, vb [B,d] normalised views (positives pair row-wise); v_neg [N,d]
-    extra negative columns for both directions. In-batch negatives included."""
+    explicit hard-negative columns for both directions.
+
+    max_inbatch_negs (M3.1 guard c): with packed variable-size micros, the
+    in-batch negative count per anchor is capped by seeded subsampling to keep
+    the InfoNCE denominator in a narrow band across micros; the positive and
+    ALL explicit hard-negative columns are always kept. Deterministic in seed.
+    """
     va, vb = va.float(), vb.float()
     neg = v_neg.float() if v_neg is not None and v_neg.numel() else None
-    targets = torch.arange(va.shape[0], device=va.device)
+    B = va.shape[0]
+    targets = torch.arange(B, device=va.device)
 
-    def one_way(x, y):
+    def keep_mask(direction_seed: int) -> torch.Tensor | None:
+        if max_inbatch_negs is None or B - 1 <= max_inbatch_negs:
+            return None
+        g = torch.Generator().manual_seed(direction_seed)
+        scores = torch.rand(B, B, generator=g)
+        scores.fill_diagonal_(2.0)  # the positive column is always kept
+        thresh = scores.topk(max_inbatch_negs + 1, dim=1).values[:, -1:]
+        return (scores >= thresh).to(va.device)
+
+    def one_way(x, y, direction_seed):
         logits = x @ y.t()
+        km = keep_mask(direction_seed)
+        if km is not None:
+            logits = logits.masked_fill(~km, float("-inf"))
         if neg is not None:
             logits = torch.cat([logits, x @ neg.t()], dim=1)
         return F.cross_entropy(logits / tau, targets)
 
-    return 0.5 * (one_way(va, vb) + one_way(vb, va))
+    return 0.5 * (one_way(va, vb, seed) + one_way(vb, va, seed + 1))

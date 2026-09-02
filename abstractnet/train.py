@@ -24,6 +24,7 @@ import subprocess
 import sys
 import threading
 import time
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -68,9 +69,10 @@ class EpochSampler:
         self._perm = None
 
     def state(self) -> dict:
-        return {"epoch": self.epoch, "index": self.index, "seed": self.seed}
+        return {"mode": "epoch", "epoch": self.epoch, "index": self.index, "seed": self.seed}
 
     def load_state(self, s: dict) -> None:
+        assert s.get("mode", "epoch") == "epoch", "checkpoint was written by a packed sampler"
         assert s["seed"] == self.seed, "sampler seed differs from checkpoint"
         self.epoch, self.index = s["epoch"], s["index"]
         self._perm = None
@@ -182,18 +184,36 @@ def dry_run(cfg: Config, tokenizer) -> None:
     src_tok = sum(ds["n_src_tokens"])
     tgt_tok = sum(ds["n_tgt_tokens"])
     tc = cfg.train
-    accum = tc.effective_batch // tc.micro_batch_size
-    steps = len(ds) // tc.effective_batch
     pad = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     collator = PairCollator(pad_id=pad)
-    sampler = EpochSampler(ds, tc.micro_batch_size, tc.seed)
-    for _ in range(3):  # collate a few real batches to prove the path
-        collator(sampler.next_rows())
     print(f"corpus: {cfg.data.corpus_path}")
     print(f"rows: {len(ds):,}   src+tgt tokens: {src_tok + tgt_tok:,}")
-    print(f"micro {tc.micro_batch_size} x accum {accum} = effective {tc.effective_batch}")
-    print(f"steps per epoch: {steps:,}   (epochs={tc.epochs} -> total {steps * tc.epochs:,})")
-    print("collation of 3 sample micro-batches: OK")
+    if tc.packing_enabled:
+        from abstractnet.data.packing import BucketedSampler
+
+        s = BucketedSampler(ds, tc.seed, tc.n_buckets, tc.micro_token_budget,
+                            tc.max_rows_per_micro, tc.token_budget)
+        plan = s.plan_step()
+        for rows in plan[:3]:
+            collator(rows)
+        sizes = [len(m) for m in plan]
+        toks = [sum(len(r["src_ids"]) + len(r["tgt_ids"]) for r in m) for m in plan]
+        print(f"packed: token_budget {tc.token_budget}, micro budget {tc.micro_token_budget}, "
+              f"{tc.n_buckets} buckets")
+        print(f"first step plan: {len(plan)} micros, rows/micro {sizes}, tokens/micro {toks}")
+        print(f"bucket sizes (rows): "
+              f"{ {b: len(v) for b, v in s.rows_by_bucket.items()} }")
+        print(f"steps per pass: {s.steps_per_epoch():,}   "
+              f"(epochs={tc.epochs} -> total {s.steps_per_epoch() * tc.epochs:,})")
+    else:
+        accum = tc.effective_batch // tc.micro_batch_size
+        steps = len(ds) // tc.effective_batch
+        sampler = EpochSampler(ds, tc.micro_batch_size, tc.seed)
+        for _ in range(3):
+            collator(sampler.next_rows())
+        print(f"micro {tc.micro_batch_size} x accum {accum} = effective {tc.effective_batch}")
+        print(f"steps per epoch: {steps:,}   (epochs={tc.epochs} -> total {steps * tc.epochs:,})")
+    print("collation of sample micro-batches: OK")
     print("DRY RUN OK")
 
 
@@ -241,10 +261,20 @@ def main() -> None:
     model.train()
 
     ds = load_from_disk(cfg.data.corpus_path)
-    accum = tc.effective_batch // tc.micro_batch_size
-    assert tc.effective_batch % tc.micro_batch_size == 0
-    sampler = EpochSampler(ds, tc.micro_batch_size, tc.seed)
-    total_steps = args.steps or tc.max_steps or sampler.steps_per_epoch(accum) * tc.epochs
+    if tc.packing_enabled:
+        from abstractnet.data.packing import BucketedSampler
+
+        sampler = BucketedSampler(ds, tc.seed, tc.n_buckets, tc.micro_token_budget,
+                                  tc.max_rows_per_micro, tc.token_budget)
+        steps_per_epoch = sampler.steps_per_epoch()
+        mode = f"packed({tc.token_budget} tok/step)"
+    else:
+        accum = tc.effective_batch // tc.micro_batch_size
+        assert tc.effective_batch % tc.micro_batch_size == 0
+        sampler = EpochSampler(ds, tc.micro_batch_size, tc.seed)
+        steps_per_epoch = sampler.steps_per_epoch(accum)
+        mode = f"unpacked(accum {accum})"
+    total_steps = args.steps or tc.max_steps or steps_per_epoch * tc.epochs
     pad = model.tokenizer.pad_token_id if model.tokenizer.pad_token_id is not None \
         else model.tokenizer.eos_token_id
     collator = PairCollator(pad_id=pad)
@@ -304,28 +334,35 @@ def main() -> None:
     prev_scale = scaler.get_scale()
     overflow_steps = 0
 
-    print(f"[train] total steps {total_steps}, accum {accum}, run {run_dir}, "
+    print(f"[train] total steps {total_steps}, {mode}, run {run_dir}, "
           f"resume at step {step}")
     mem.reset_peak()
     while step < total_steps:
         t0 = time.monotonic()
         batch_ids: list[str] = []
         loss_acc = recon = con = kl = 0.0
-        tokens = 0
         p_id = p_id_at(step, total_steps, tc)
         collator.p_id = p_id
-        for micro in range(accum):
+        if tc.packing_enabled:
+            micro_rows = sampler.plan_step()
+        else:
+            micro_rows = [sampler.next_rows() for _ in range(accum)]
+        micro_toks = [sum(len(r["src_ids"]) + len(r["tgt_ids"]) for r in rows)
+                      for rows in micro_rows]
+        tokens = sum(micro_toks)
+        micro_pairs = [len(rows) for rows in micro_rows]
+        origins = Counter(r["origin"].split("-")[0] for rows in micro_rows for r in rows)
+        for micro, rows in enumerate(micro_rows):
+            w = micro_toks[micro] / tokens  # token-weighted micro combination
             collator.reseed(hash((tc.seed, step, micro)) & 0x7FFFFFFF)
-            rows = sampler.next_rows()
             batch = collator(rows)
             batch_ids += batch["meta"]["id"]
-            tokens += int(batch["src_mask"].sum() + batch["tgt_mask"].sum())
             out = model(batch)
-            scaler.scale(out["loss"] / accum).backward()
-            loss_acc += float(out["loss"]) / accum
-            recon += float(out["recon"]) / accum
-            con += float(out["contrastive"]) / accum
-            kl += float(out["rate_kl"]) / accum
+            scaler.scale(out["loss"] * w).backward()
+            loss_acc += float(out["loss"].detach()) * w
+            recon += float(out["recon"]) * w
+            con += float(out["contrastive"]) * w
+            kl += float(out["rate_kl"]) * w
         scaler.unscale_(opt)
         torch.nn.utils.clip_grad_norm_(new_p + lora_p, tc.grad_clip)
         scaler.step(opt)
@@ -344,7 +381,9 @@ def main() -> None:
         dt = time.monotonic() - t0
         step_times.append(dt)
 
-        rec = {"step": step, "epoch": sampler.epoch, "loss": round(loss_acc, 5),
+        epoch_now = sampler.epoch if isinstance(sampler.epoch, int) else min(sampler.epoch.values())
+        rec = {"step": step, "epoch": epoch_now, "loss": round(loss_acc, 5),
+               "micro_pairs": micro_pairs, "origins": dict(origins),
                "recon": round(recon, 5), "con": round(con, 5), "kl": round(kl, 6),
                "lr": opt.param_groups[0]["lr"], "scale": new_scale, "p_id": round(p_id, 4),
                "dt_s": round(dt, 3), "tok": tokens, "tok_s": round(tokens / dt),
@@ -371,6 +410,16 @@ def main() -> None:
             writer.add_scalar("z/dim_var_mean", float(out["z_dim_var_mean"]), step)
             print(f"step {step:>6}/{total_steps}  loss {loss_acc:.4f}  recon {recon:.4f}  "
                   f"con {con:.4f}  scale {new_scale:.0f}  {dt:.2f}s", flush=True)
+
+        # ---- mini report (first mini_report_until steps only)
+        if step <= tc.mini_report_until and step % tc.mini_report_every == 0:
+            try:
+                from eval import val_report
+
+                val_report.mini_generate(model, cfg, run_dir, step, writer)
+            except Exception as e:
+                print(f"[mini] failed (training continues): {type(e).__name__}: {e}")
+            model.train()
 
         # ---- validation report
         if step >= next_eval:

@@ -78,6 +78,15 @@ class TrainCfg:
     checkpoint_interval_minutes: float = 15.0
     keep_checkpoints: int = 3
     telemetry_interval_s: float = 30.0
+    # M3.1: token-budget packing (guards a-c) + mini reports
+    packing_enabled: bool = False   # flipped to True only after the A/B gate
+    token_budget: int = 40000       # pair tokens per optimizer step
+    micro_token_budget: int = 5000
+    max_rows_per_micro: int = 48
+    n_buckets: int = 4
+    max_inbatch_negs: int = 31      # per-anchor in-micro negative band
+    mini_report_every: int = 50     # cheap z/gates/AUC snapshot cadence...
+    mini_report_until: int = 1000   # ...for the first N steps, then off
 
 
 @dataclass
