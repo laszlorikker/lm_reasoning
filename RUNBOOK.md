@@ -141,22 +141,25 @@ the panel decodes becoming paraphrases rather than copies or babble.
 - Keep everything on the Linux filesystem (it already is); never move the run
   dir to /mnt/c.
 
-## 7. Expected numbers (measured in M3, 2026-09-01)
+## 7. Expected numbers (measured in M3.1, 2026-09-02 — PACKED pilot on v1.2)
 
-- Batch: micro 8 × accumulation 8 = effective 64. (Sweep: micro 8/12/16 all
-  land at ~1,780 pair-tok/s on worst-case docs — the GPU is saturated at 8;
-  micro 8 has the most memory slack: 7.07 GiB reserved of the 14 budget.)
-- Steps per corpus pass: **5,856** (374,834 pairs / 64).
-- Seconds per step: **~11.6** corpus-average (8 micros ≈ 1.45 s each;
-  worst-case 512-token micros run 2.95 s).
-- Throughput: **~740 pair-tokens/s** corpus-average (short documents underfill
-  the GPU; long-doc batches reach ~1,790). One full pass ≈ **~19 h**.
-- A 30-minute window ≈ ~150 steps. An 8-hour overnight ≈ ~2,450 steps ≈ 42%
-  of a pass.
+- Batching: **token-budget packing is the default** (A/B gate passed —
+  runs/m3_1/ab_packing.json): 40k pair tokens per optimizer step, 5k-token
+  length-bucketed micros (4 buckets, rotated every micro, ≤48 rows), in-micro
+  contrastive negatives capped at 31 per anchor.
+- Corpus: pilot_v1.2 — 375,671 pairs, 44.8M src+tgt tokens.
+- Steps per pass: **1,120**. Seconds per step: **~31.5** cold, expect ~33–36
+  heat-soaked. Throughput: **~1,350 pair-tokens/s** (unpacked was ~740).
+- **One full pass ≈ 10–11 h** (was ~19 h unpacked).
+- A 30-minute window ≈ ~55 steps. An 8-hour overnight ≈ ~850 steps ≈ 76% of
+  a pass.
+- Warmup is 100 steps (= 4M tokens, matching the old 500 × 7.7k). If you ever
+  disable packing, set warmup_steps back to 500.
 - Peak training memory ≈ 6.8 GiB allocated (guard armed at 14).
-- Validation report: **~9 min each** (first ever downloads the NLI model once);
-  the auto-interval then lands near ~500 steps, i.e. one report ≈ every 1.6 h.
-- Loss scale settles in the low thousands after ~5 early halvings — that
+- Mini reports (~30 s: z spectrum, eff. rank, mini AUC, gates) every 50 steps
+  until step 1,000 → `runs/<run>/val/mini/`; full validation report
+  auto-interval lands near ~175 steps ≈ every 1.5 h wall.
+- Loss scale settles in the low thousands after a few early halvings — that
   settling is normal, a later downward staircase is not.
 
 ## 7b. Sanity numbers from the 200-step smoke (untrained baselines)

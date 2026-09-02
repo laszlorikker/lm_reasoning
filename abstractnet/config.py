@@ -43,7 +43,7 @@ class DataCfg:
     max_target_tokens: int = 512
     max_chunks: int = 8
     max_chunk_tokens: int = 64
-    corpus_path: str = "data/processed/pilot_v1.1/full"
+    corpus_path: str = "data/processed/pilot_v1.2/full"
     val_pool_path: str = "data/fixtures/val_pool_v2.jsonl"
     panel_path: str = "data/fixtures/panel_v1.jsonl"
     # pilot-corpus recipe (source budgets, negative shares, K targets);

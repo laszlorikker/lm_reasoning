@@ -1,0 +1,69 @@
+# M3.1: resume proof for PACKED mode (packing changes the sampler, so M3's
+# resume guarantee is re-proven, not assumed). Small budgets for fast steps;
+# eval/mini off so only the train/checkpoint/resume path is exercised.
+
+model:
+  name_or_path: Qwen/Qwen3-1.7B-Base
+  attn_implementation: sdpa
+  dtype: float16
+  load_in_4bit: false
+  split_layer: 14
+  d_z: 1024
+  languages: [en, fr, de, es, it, pt]
+  k_max: 8
+  pool_heads: 8
+  pool_head_dim: 128
+  xattn_every: 2
+  xattn_heads: 8
+  xattn_head_dim: 128
+  rate: noise
+  rate_sigma: 0.1
+  word_dropout: 0.2
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  encoder_lora_layers: []
+
+data:
+  max_source_tokens: 512
+  max_target_tokens: 512
+  max_chunks: 8
+  max_chunk_tokens: 64
+  corpus_path: data/processed/pilot_v1.2/full
+
+train:
+  micro_batch_size: 8
+  effective_batch: 16
+  packing_enabled: true
+  token_budget: 6000
+  micro_token_budget: 3000
+  max_rows_per_micro: 48
+  n_buckets: 4
+  max_inbatch_negs: 31
+  tau: 0.05
+  lambda_c: 0.1
+  lambda_r: 1.0e-3
+  chunk_ce_size: 1024
+  p_id_start: 0.2
+  p_id_end: 0.05
+  p_id_decay_frac: 0.2
+  lr_new: 2.0e-4
+  lr_lora: 1.0e-4
+  warmup_steps: 50
+  weight_decay: 0.01
+  grad_clip: 1.0
+  epochs: 1
+  max_steps: 0
+  seed: 777
+  log_interval: 50
+  eval_interval_steps: 1000000
+  mini_report_every: 50
+  mini_report_until: 0
+  checkpoint_interval_steps: 25
+  checkpoint_interval_minutes: 10000.0
+  keep_checkpoints: 10
+
+profile:
+  batch_size: 8
+  seq_len: 512
+  vram_budget_gib: 14.0

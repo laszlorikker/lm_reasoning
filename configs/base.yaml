@@ -30,6 +30,7 @@ data:
   max_target_tokens: 512
   max_chunks: 8
   max_chunk_tokens: 64
+  corpus_path: data/processed/pilot_v1.2/full
   # ~50M source+target tokens, >=30% of pairs with K>=3 chunks (M1 addition 2).
   # Achieved counts/K-distribution land in DATA.md from runs/m1/pilot_stats.json.
   pilot:
@@ -55,8 +56,9 @@ data:
       math_derivation: {n: 45000, split: train_5M, max_pairs_per_problem: 4}
 
 train:
-  micro_batch_size: 8
-  # M2 loss knobs (PHASE1_PLAN §4); optimiser/schedule land in M3
+  micro_batch_size: 8            # unpacked fallback only (packing is default)
+  effective_batch: 64            # unpacked fallback accumulation
+  # M2 loss knobs (PHASE1_PLAN §4)
   tau: 0.05
   lambda_c: 0.1
   lambda_r: 1.0e-3
@@ -64,6 +66,33 @@ train:
   p_id_start: 0.2
   p_id_end: 0.05
   p_id_decay_frac: 0.2
+  # M3 optimiser / schedule / run mechanics
+  lr_new: 2.0e-4
+  lr_lora: 1.0e-4
+  # M3.1: packed steps carry 40k tokens; 100 warmup steps = 4M tokens,
+  # matching the old 500 x ~7.7k. Set back to 500 if packing is disabled.
+  warmup_steps: 100
+  weight_decay: 0.01
+  grad_clip: 1.0
+  epochs: 1
+  max_steps: 0
+  seed: 1234
+  log_interval: 10
+  eval_interval_steps: 0         # 0 = auto from the <10% rule
+  checkpoint_interval_steps: 500
+  checkpoint_interval_minutes: 15.0
+  keep_checkpoints: 3
+  telemetry_interval_s: 30.0
+  # M3.1 token-budget packing (guards a-c). A/B gate passed 2026-09-02
+  # (runs/m3_1/ab_packing.json) -> packed is the default.
+  packing_enabled: true
+  token_budget: 40000
+  micro_token_budget: 5000
+  max_rows_per_micro: 48
+  n_buckets: 4
+  max_inbatch_negs: 31
+  mini_report_every: 50          # cheap z/gates/AUC snapshot cadence...
+  mini_report_until: 1000        # ...for the first N steps, then off
 
 profile:
   batch_size: 8
