@@ -65,11 +65,12 @@ def stage_bundle(stage: Path, with_wheelhouse: bool) -> list[Path]:
 
     for mid in model_ids():
         local = Path(snapshot_download(mid))  # cached; downloads only if absent
-        cache_dir = local.parents[2]  # .../hub/models--org--name/snapshots/<rev>
-        rel = cache_dir.relative_to(cache_dir.parents[1])
-        dst = stage / "hf_cache" / "hub" / rel.name
-        print(f"[stage] {mid} -> {rel.name}")
-        shutil.copytree(cache_dir, dst, symlinks=False)  # materialise blob symlinks
+        model_dir = local.parents[1]  # .../hub/models--org--name (blobs+snapshots+refs)
+        dst = stage / "hf_cache" / "hub" / model_dir.name
+        print(f"[stage] {mid} -> {model_dir.name}")
+        # keep the relative snapshot->blob symlinks: tar preserves them and the
+        # HF cache layout stays valid; materialising would double the size
+        shutil.copytree(model_dir, dst, symlinks=True)
 
     corpus_src = Path("data/processed/pilot_v1.3")
     corpus_dst = stage / "data" / "processed" / "pilot_v1.3"
