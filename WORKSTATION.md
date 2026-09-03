@@ -65,11 +65,17 @@ Use `--config configs/workstation.yaml` in every command below.
 ## 4. Data + models — the offline bundle (the only path; HF is blocked)
 
 Fixtures (val pool v3, panel, audit samples) arrive via git. Everything heavy
-comes from the GitHub Release:
+comes from the GitHub Release. Prerequisites: `gh auth status` OK, the `zstd`
+binary (`sudo apt-get install -y zstd` or `conda install -c conda-forge zstd`),
+and ~16 GB free on the repo's filesystem (6.4 GB of parts + the unpacked tree;
+the script checks and refuses otherwise — pass `--download-dir` to point it at
+a bigger disk).
 
 ```bash
+git pull                                         # the gate fix of 2026-09-03 is required
 python scripts/import_offline_bundle.py --version bundle-v1
 conda deactivate && conda activate abstractnet   # pick up the offline env hook
+rm -rf data/_bundle_in                           # scratch parts + unpacked tree, ~15 GB
 ```
 
 The import downloads the release assets, verifies every sha256 against the

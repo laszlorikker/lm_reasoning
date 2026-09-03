@@ -10,20 +10,31 @@ and offline flags into the conda activation hook → run the gates:
   3. finalize stats must MATCH DATA.md: n_pairs 375,671 / K>=3 33.4% /
      dedup removed 17,268
 
+Needs: `gh` authenticated (repo scope), the `zstd` binary, ~16 GB free on the
+download filesystem (6.4 GB of parts + the unpacked tree, moved into place
+afterwards). The download dir defaults to data/_bundle_in (gitignored, same
+filesystem as data/processed so the corpus move is a rename).
+
 Usage (from the repo root on the workstation):
     python scripts/import_offline_bundle.py [--version bundle-v1]
-        [--hf-home ~/hf_home] [--gh gh] [--skip-gates]
+        [--hf-home ~/hf_home] [--gh gh] [--download-dir DIR] [--skip-gates]
 """
 
 import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-EXPECTED = {"n_pairs": 375671, "multichunk_share_pairs": 0.332, "removed_pairs": 17268}
+# Reference values from the laptop's v1.3 finalize (runs/m1/pilot_v1.3_stats.json,
+# DATA.md §2). The K>=3 share is compared with a tolerance; the counts exactly.
+# (0.332 was the v1.1 share — a stale value here failed the gate; fixed 2026-09-03.)
+EXPECTED = {"n_pairs": 375671, "multichunk_share_pairs": 0.3335, "removed_pairs": 17268}
+SHARE_TOL = 1e-3
+MIN_FREE_BYTES = 16_000_000_000
 
 
 def sha256(path: Path) -> str:
@@ -39,11 +50,22 @@ def main() -> None:
     ap.add_argument("--version", default="bundle-v1")
     ap.add_argument("--hf-home", default=str(Path.home() / "hf_home"))
     ap.add_argument("--gh", default="gh")
-    ap.add_argument("--download-dir", default="/tmp/abstractnet_bundle_in")
+    ap.add_argument("--download-dir", default="data/_bundle_in",
+                    help="scratch dir for parts + unpacked tree (default: inside the repo, "
+                         "same filesystem as data/processed)")
     ap.add_argument("--skip-gates", action="store_true")
     args = ap.parse_args()
     dl = Path(args.download_dir)
     dl.mkdir(parents=True, exist_ok=True)
+
+    if shutil.which("zstd") is None:
+        sys.exit("zstd binary not found — install it first: "
+                 "`sudo apt-get install -y zstd` or `conda install -c conda-forge zstd`")
+    free = shutil.disk_usage(dl).free
+    print(f"[disk] {free / 1e9:.1f} GB free under {dl}")
+    if free < MIN_FREE_BYTES:
+        sys.exit(f"need ~{MIN_FREE_BYTES / 1e9:.0f} GB free under {dl} for parts + unpacked "
+                 "tree; pass --download-dir on a larger filesystem")
 
     print(f"[download] release {args.version} …")
     subprocess.run([args.gh, "release", "download", args.version, "--dir", str(dl),
@@ -67,15 +89,17 @@ def main() -> None:
     for model_dir in sorted((stage / "hf_cache" / "hub").iterdir()):
         dst = hf_home / "hub" / model_dir.name
         if not dst.exists():
-            model_dir.rename(dst)
+            # shutil.move: a rename on the same filesystem, copy+delete across
+            # devices (Path.rename raises EXDEV when /tmp or $HOME is a separate fs)
+            shutil.move(str(model_dir), str(dst))
         print(f"[hf] {model_dir.name}")
     Path("data/processed").mkdir(parents=True, exist_ok=True)
     src = stage / "data" / "processed" / "pilot_v1.3"
     if not Path("data/processed/pilot_v1.3").exists():
-        src.rename("data/processed/pilot_v1.3")
+        shutil.move(str(src), "data/processed/pilot_v1.3")
     Path("runs/m1").mkdir(parents=True, exist_ok=True)
     if not Path("runs/m1/eval_hashes.txt").exists():
-        (stage / "runs" / "m1" / "eval_hashes.txt").rename("runs/m1/eval_hashes.txt")
+        shutil.move(str(stage / "runs" / "m1" / "eval_hashes.txt"), "runs/m1/eval_hashes.txt")
 
     # offline env: conda activation hook
     env_dir = Path(sys.prefix) / "etc" / "conda" / "activate.d"
@@ -100,8 +124,12 @@ def main() -> None:
     got = {"n_pairs": stats["n_pairs"],
            "multichunk_share_pairs": stats["multichunk_share_pairs"],
            "removed_pairs": stats["dedup"]["removed_pairs"]}
-    assert got == EXPECTED, f"DATA.md mismatch: {got} != {EXPECTED}"
+    ok = (got["n_pairs"] == EXPECTED["n_pairs"]
+          and got["removed_pairs"] == EXPECTED["removed_pairs"]
+          and abs(got["multichunk_share_pairs"] - EXPECTED["multichunk_share_pairs"]) < SHARE_TOL)
+    assert ok, f"DATA.md mismatch: {got} != {EXPECTED}"
     print(f"[gate 3] DATA.md match OK: {got}")
+    print(f"[cleanup] safe to remove the scratch dir now: rm -rf {dl}")
     print(f"bundle git commit {manifest['git_commit'][:8]} vs local "
           f"{subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout[:8]}")
     print("IMPORT COMPLETE — all gates passed")
